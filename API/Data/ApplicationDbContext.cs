@@ -12,6 +12,8 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
     public DbSet<GoalTypeLog> GoalTypeLogs { get; set; }
     public DbSet<ActivityLevel> ActivityLevels { get; set; }
     public DbSet<ActivityLevelLog> ActivityLevelLogs { get; set; }
+    public DbSet<ProductNutritionCategory> ProductNutritionCategories { get; set; }
+    public DbSet<ProductNutrition> ProductNutritions { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -29,6 +31,11 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
             .HasData(
                 new Role { Id = 1, Name = "User", NormalizedName = "USER" }
             );
+        
+        builder.Entity<ProductNutritionCategory>()
+            .HasMany(c => c.ProductNutritions)
+            .WithOne(p => p.ProductNutritionCategory)
+            .HasForeignKey(p => p.ProductNutritionCategoryId);
         
         //Activity and Goal types
         
