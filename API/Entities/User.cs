@@ -9,4 +9,6 @@ public class User : IdentityUser<int>
 
     public DateTime DateOfBirth { get; set; }
     public int Height { get; set; }
+
+    public List<WeightRecord> WeightRecords { get; set; }
 }

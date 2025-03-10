@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
 using NutriTrack.DTO;
 using NutriTrack.Entity;
@@ -17,11 +18,18 @@ public class AccountController(UserManager<User> userManager, TokenService token
         if (user is null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
             return Unauthorized();
         
+        var latestWeightRecord = await context.WeightRecords
+            .Include(w => w.User)
+            .Where(w => w.User.Id == user.Id)
+            .OrderByDescending(w => w.DateOfRecordCreated)
+            .FirstOrDefaultAsync();
+        
         return new UserDto
         {
             Id = user.Id,
             Username = user.UserName,
             Height = user.Height,
+            Weight = latestWeightRecord?.Weight ?? 0,
             Gender = user.UserGender.ToString(),
             DateOfBirth = user.DateOfBirth,
             Token = await tokenService.GenerateToken(user)
@@ -54,6 +62,17 @@ public class AccountController(UserManager<User> userManager, TokenService token
 
         await userManager.AddToRoleAsync(user, "User");
 
+        var weightRecord = new WeightRecord
+        {
+            DateOfRecordCreated = DateTime.Now.Date,
+            User = user,
+            Weight = registerDto.Weight
+        };
+        
+        await context.WeightRecords.AddAsync(weightRecord);
+        
+        await context.SaveChangesAsync();
+        
         Console.WriteLine($"User {user.UserName} with id: {user.Id} has been created");
         
         return StatusCode(201);
