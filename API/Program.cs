@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NutriTrack.Data;
+using NutriTrack.Entities;
 using NutriTrack.Entity;
 using NutriTrack.Middlewares;
 using NutriTrack.Services;

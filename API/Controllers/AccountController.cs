@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
 using NutriTrack.DTO;
+using NutriTrack.Entities;
 using NutriTrack.Entity;
 using NutriTrack.Entity.Enums;
 using NutriTrack.Services;
@@ -70,12 +71,47 @@ public class AccountController(UserManager<User> userManager, TokenService token
         };
         
         await context.WeightRecords.AddAsync(weightRecord);
+
+
+        var goal = await GetGoalTypeByName(registerDto.Goal);
+        var activityLevel = await GetActivityLevelByName(registerDto.Activity);
+        if (goal == null || activityLevel == null)
+        {
+            return NotFound("Goal or activity not found");
+        }
+        
+        var initialGoalTypeLog = new GoalTypeLog
+        {
+            Date = DateTime.Now.Date,
+            Goal = goal,
+            User = user,
+        };
+        
+        await context.GoalTypeLogs.AddAsync(initialGoalTypeLog);
+        
+        var initialActivityLevelLog = new ActivityLevelLog
+        {
+            Date = DateTime.Now.Date,
+            ActivityLevel = activityLevel,
+            User = user,
+        };
+        
+        await context.ActivityLevelLogs.AddAsync(initialActivityLevelLog);
         
         await context.SaveChangesAsync();
         
         Console.WriteLine($"User {user.UserName} with id: {user.Id} has been created");
         
         return StatusCode(201);
+    }
+    
+    private async Task<GoalType?> GetGoalTypeByName(string name)
+    {
+        return await context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
+    }
+    private async Task<ActivityLevel?> GetActivityLevelByName(string name)
+    {
+        return await context.ActivityLevels.FirstOrDefaultAsync(g => g.Name == name);
     }
 }
 

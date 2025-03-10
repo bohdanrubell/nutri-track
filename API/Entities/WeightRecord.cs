@@ -1,4 +1,6 @@
-﻿namespace NutriTrack.Entity;
+﻿using NutriTrack.Entities;
+
+namespace NutriTrack.Entity;
 
 public class WeightRecord
 {
