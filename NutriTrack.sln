@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NutriTrack", "NutriTrack\NutriTrack.csproj", "{0BD71737-7FC2-4D6D-A07F-2E189C20190A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{0BD71737-7FC2-4D6D-A07F-2E189C20190A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
