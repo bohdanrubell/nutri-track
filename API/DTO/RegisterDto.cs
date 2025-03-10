@@ -1,11 +1,11 @@
 ﻿namespace NutriTrack.DTO;
 
-public class UserDto
+public class RegisterDto
 {
-    public int Id { get; set; }
     public string Username { get; set; }
-    public int Height { get; set; }
+    public string Password { get; set; }
+    public string Email { get; set; }
     public string Gender { get; set; }
     public DateTime DateOfBirth { get; set; }
-    public string Token { get; set; }
+    public int Height { get; set; }
 }
