@@ -37,6 +37,11 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
             .WithOne(p => p.ProductNutritionCategory)
             .HasForeignKey(p => p.ProductNutritionCategoryId);
         
+        builder.Entity<User>()
+            .HasOne(u => u.Diary)
+            .WithOne(d => d.User)
+            .HasForeignKey<Diary>(d => d.UserId);
+        
         //Activity and Goal types
         
         // Налаштування зв'язку "один до багатьох" між User та ActivityLevelLog
