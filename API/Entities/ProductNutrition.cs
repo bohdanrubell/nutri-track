@@ -11,4 +11,6 @@ public class ProductNutrition
     public int CarbohydratesPer100Grams { get; set; }
 
     public ProductNutritionCategory ProductNutritionCategory { get; set; }
+    
+    public List<ProductRecord> ProductRecords { get; set; }
 }

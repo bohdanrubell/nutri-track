@@ -97,6 +97,14 @@ public class AccountController(UserManager<User> userManager, TokenService token
         };
         
         await context.ActivityLevelLogs.AddAsync(initialActivityLevelLog);
+
+        var initialDiary = new Diary
+        {
+            DateDiaryCreated = DateTime.Now.Date,
+            User = user
+        };
+        
+        await context.Diaries.AddAsync(initialDiary);
         
         await context.SaveChangesAsync();
         

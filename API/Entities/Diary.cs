@@ -7,4 +7,6 @@ public class Diary
     
     public int UserId { get; set; }
     public User User { get; set; }
+
+    public List<Record> Records { get; set; }
 }

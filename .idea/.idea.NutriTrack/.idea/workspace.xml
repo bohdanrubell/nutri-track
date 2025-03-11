@@ -9,12 +9,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9051524e-266b-4a46-adb2-63f1d28e5704" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/API/Entities/Diary.cs" afterDir="false" />
+    <list default="true" id="9051524e-266b-4a46-adb2-63f1d28e5704" name="Changes" comment="updated gitignore">
+      <change afterPath="$PROJECT_DIR$/API/Entities/ProductRecord.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Entities/Record.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Controllers/AccountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Controllers/AccountController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/API/Data/ApplicationDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Data/ApplicationDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Entities/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Entities/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NutriTrack.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/NutriTrack.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Data/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Data/Migrations/ApplicationDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Entities/Diary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Entities/Diary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Entities/ProductNutrition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Entities/ProductNutrition.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,14 +35,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d382df578ec93391918cfaa4ce7f4b8f35c9aed1241d6556dc9be26df13c/IdentityUser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d8d9726f3deb1bbf671f5b791e4dc3e0338219a996f439ad2a69024b825c60/UserManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Controllers/AccountController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Controllers/AccountController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/DIPLOMA/NutriTrack/API/Data/ApplicationDbContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Data/ApplicationDbContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Data/Migrations/ApplicationDbContextModelSnapshot.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Properties/launchSettings.json" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -122,7 +118,7 @@
       <option name="presentableId" value="Default" />
       <updated>1723646017600</updated>
       <workItem from="1741610195453" duration="14350000" />
-      <workItem from="1741679168141" duration="697000" />
+      <workItem from="1741679168141" duration="3360000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />
@@ -204,7 +200,23 @@
       <option name="project" value="LOCAL" />
       <updated>1741624603035</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="added diary entity and made relationship one-to-one with user">
+      <option name="closed" value="true" />
+      <created>1741680034373</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1741680034373</updated>
+    </task>
+    <task id="LOCAL-00012" summary="updated gitignore">
+      <option name="closed" value="true" />
+      <created>1741680108060</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1741680108060</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,12 +241,13 @@
     <MESSAGE value="added important packages" />
     <MESSAGE value="renamed to API" />
     <MESSAGE value="removed redundant files" />
-    <MESSAGE value="updated gitignore" />
     <MESSAGE value="added important initial files. Added ASP.NET Authorization. Created AccountController(Login)" />
     <MESSAGE value="added part of user's characteristics" />
     <MESSAGE value="added a possibility to add the first weight record during the registration" />
     <MESSAGE value="IMPORTANT: added alg to add important user characteristics separately. (Weight, Goal, Activity Level are tracked)" />
     <MESSAGE value="added product and product category entity" />
-    <option name="LAST_COMMIT_MESSAGE" value="added product and product category entity" />
+    <MESSAGE value="added diary entity and made relationship one-to-one with user" />
+    <MESSAGE value="updated gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated gitignore" />
   </component>
 </project>

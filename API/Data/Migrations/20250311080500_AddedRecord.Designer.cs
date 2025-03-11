@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriTrack.Data;
 
@@ -10,9 +11,11 @@ using NutriTrack.Data;
 namespace NutriTrack.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250311080500_AddedRecord")]
+    partial class AddedRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
@@ -175,7 +178,7 @@ namespace NutriTrack.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Diaries");
+                    b.ToTable("Diary");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.GoalType", b =>
@@ -267,30 +270,6 @@ namespace NutriTrack.Data.Migrations
                     b.ToTable("ProductNutritionCategories");
                 });
 
-            modelBuilder.Entity("NutriTrack.Entities.ProductRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("Grams")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("ProductNutritionId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RecordId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductNutritionId");
-
-                    b.HasIndex("RecordId");
-
-                    b.ToTable("ProductRecords");
-                });
-
             modelBuilder.Entity("NutriTrack.Entities.Record", b =>
                 {
                     b.Property<int>("Id")
@@ -329,7 +308,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("GoalLogId");
 
-                    b.ToTable("Records");
+                    b.ToTable("Record");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.User", b =>
@@ -575,25 +554,6 @@ namespace NutriTrack.Data.Migrations
                     b.Navigation("ProductNutritionCategory");
                 });
 
-            modelBuilder.Entity("NutriTrack.Entities.ProductRecord", b =>
-                {
-                    b.HasOne("NutriTrack.Entities.ProductNutrition", "ProductNutrition")
-                        .WithMany("ProductRecords")
-                        .HasForeignKey("ProductNutritionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NutriTrack.Entities.Record", "Record")
-                        .WithMany("ProductRecords")
-                        .HasForeignKey("RecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProductNutrition");
-
-                    b.Navigation("Record");
-                });
-
             modelBuilder.Entity("NutriTrack.Entities.Record", b =>
                 {
                     b.HasOne("NutriTrack.Entities.ActivityLevelLog", "ActivityLog")
@@ -647,19 +607,9 @@ namespace NutriTrack.Data.Migrations
                     b.Navigation("Logs");
                 });
 
-            modelBuilder.Entity("NutriTrack.Entities.ProductNutrition", b =>
-                {
-                    b.Navigation("ProductRecords");
-                });
-
             modelBuilder.Entity("NutriTrack.Entities.ProductNutritionCategory", b =>
                 {
                     b.Navigation("ProductNutritions");
-                });
-
-            modelBuilder.Entity("NutriTrack.Entities.Record", b =>
-                {
-                    b.Navigation("ProductRecords");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.User", b =>

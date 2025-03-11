@@ -14,6 +14,10 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
     public DbSet<ActivityLevelLog> ActivityLevelLogs { get; set; }
     public DbSet<ProductNutritionCategory> ProductNutritionCategories { get; set; }
     public DbSet<ProductNutrition> ProductNutritions { get; set; }
+    public DbSet<Diary> Diaries { get; set; }
+    public DbSet<Record> Records { get; set; }
+    public DbSet<ProductRecord> ProductRecords { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -41,6 +45,16 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
             .HasOne(u => u.Diary)
             .WithOne(d => d.User)
             .HasForeignKey<Diary>(d => d.UserId);
+        
+        builder.Entity<ProductNutrition>()
+            .HasMany(pn => pn.ProductRecords)
+            .WithOne(pr => pr.ProductNutrition)
+            .HasForeignKey(pr => pr.ProductNutritionId);
+        
+        builder.Entity<Record>()
+            .HasMany(r => r.ProductRecords)
+            .WithOne(pr => pr.Record)
+            .HasForeignKey(pr => pr.RecordId);
         
         //Activity and Goal types
         
