@@ -72,7 +72,7 @@ builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseException();
 
 if (app.Environment.IsDevelopment())
 {
