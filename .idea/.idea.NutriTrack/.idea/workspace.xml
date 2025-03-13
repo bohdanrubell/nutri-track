@@ -11,7 +11,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9051524e-266b-4a46-adb2-63f1d28e5704" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Middlewares/ExceptionMiddleware.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Middlewares/ExceptionMiddleware.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/API/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +114,9 @@
       <updated>1723646017600</updated>
       <workItem from="1741610195453" duration="14350000" />
       <workItem from="1741679168141" duration="5917000" />
-      <workItem from="1741785753501" duration="348000" />
+      <workItem from="1741785753501" duration="1338000" />
+      <workItem from="1741791537374" duration="1000" />
+      <workItem from="1741895339283" duration="1633000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />
@@ -221,7 +222,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741682663123</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="updated middleware">
+      <option name="closed" value="true" />
+      <created>1741786222496</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1741786222496</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,6 +263,7 @@
     <MESSAGE value="added diary entity and made relationship one-to-one with user" />
     <MESSAGE value="updated gitignore" />
     <MESSAGE value="added full db-scheme. Added process of creating an initial diary." />
-    <option name="LAST_COMMIT_MESSAGE" value="added full db-scheme. Added process of creating an initial diary." />
+    <MESSAGE value="updated middleware" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated middleware" />
   </component>
 </project>
