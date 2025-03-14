@@ -17,6 +17,15 @@ public static class DbInitializer
 
             await userManager.CreateAsync(user, "Pa$$w0rd");
             await userManager.AddToRoleAsync(user, "User");
+            
+            var admin = new User
+            {
+                UserName = "admin",
+                Email = "admin@gmail.com"
+            };
+
+            await userManager.CreateAsync(admin, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(admin, "Admin");
         }
 
         if (context.ActivityLevels.Any() && context.GoalTypes.Any()) return;
