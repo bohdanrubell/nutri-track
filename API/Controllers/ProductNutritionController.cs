@@ -13,13 +13,15 @@ namespace NutriTrack.Controllers;
 public class ProductNutritionController : BaseApiController
 {
     private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper;
 
     public ProductNutritionController(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    [HttpGet("{id}", Name = "GetProductNutrition")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<ProductNutrition>> GetProductNutrition(int id)
     {
         var productNutrition = await _context.ProductNutritions
@@ -59,6 +61,55 @@ public class ProductNutritionController : BaseApiController
         Response.AddPaginationHeader(products.MetaData);
 
         return products;
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("create")]
+    public async Task<ActionResult<ProductNutrition>> CreateProductNutrition(CreateProductNutritionRequest request)
+    {
+        var newProduct = _mapper.Map<ProductNutrition>(request);
+
+        var category = await _context.ProductNutritionCategories
+            .Where(c => c.Name == request.CategoryName)
+            .SingleOrDefaultAsync();
+        
+        if (category is null) return NotFound("Category not found");
+        
+        newProduct.ProductNutritionCategory = category;
+        
+        await _context.ProductNutritions.AddAsync(newProduct);
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (result) return Created();
+
+        return BadRequest("Problem creating new product");
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPut("update")]
+    public async Task<ActionResult> UpdateProductNutrition(UpdateProductNutritionRequest request)
+    {
+        var updatedProduct = await _context.ProductNutritions
+            .SingleOrDefaultAsync(p => p.Id == request.Id);
+
+        if (updatedProduct == null) return NotFound();
+
+        _mapper.Map(request, updatedProduct);
+
+        var category = await _context.ProductNutritionCategories
+            .Where(c => c.Name == request.CategoryName)
+            .SingleOrDefaultAsync();
+        
+        if (category == null) return NotFound("Category not found");
+        
+        updatedProduct.ProductNutritionCategory = category;
+        
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (result) return NoContent();
+
+        return BadRequest("Problem updating product");
     }
     
     [Authorize(Roles = "Admin")]
