@@ -33,7 +33,8 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
         
         builder.Entity<Role>()
             .HasData(
-                new Role { Id = 1, Name = "User", NormalizedName = "USER" }
+                new Role { Id = 1, Name = "User", NormalizedName = "USER" },
+                new Role { Id = 2, Name = "Admin", NormalizedName = "ADMIN" }
             );
         
         builder.Entity<ProductNutritionCategory>()
