@@ -39,23 +39,33 @@ public class ProductNutritionController : BaseApiController
         return await _context.ProductNutritionCategories
             .Select(p => new ProductNutritionCategoryResponse
             {
-                Id = p.Id,
                 Name = p.Name
             })
             .ToListAsync();
     }
     
     [HttpGet]
-    public async Task<ActionResult<PagedList<ProductNutrition>>> GetProducts(
+    public async Task<ActionResult<PagedList<ProductNutritionResponse>>> GetProducts(
         [FromQuery] ProductNutritionParams productNutritionParams)
     {
         var query = _context.ProductNutritions
+            .Include(p => p.ProductNutritionCategory)
             .Sort(productNutritionParams.OrderBy)
             .Search(productNutritionParams.SearchTerm)
+            .Select(p => new ProductNutritionResponse
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Calories = p.CaloriesPer100Grams,
+                Protein = p.ProteinPer100Grams,
+                Carbohydrates = p.CarbohydratesPer100Grams,
+                Fat = p.FatPer100Grams,
+                Category = p.ProductNutritionCategory.Name,
+            })
             .AsQueryable();
 
         var products =
-            await PagedList<ProductNutrition>.ToPagedList(query, productNutritionParams.PageNumber,
+            await PagedList<ProductNutritionResponse>.ToPagedList(query, productNutritionParams.PageNumber,
                 productNutritionParams.PageSize);
 
         Response.AddPaginationHeader(products.MetaData);

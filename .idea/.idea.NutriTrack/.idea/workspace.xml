@@ -10,12 +10,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9051524e-266b-4a46-adb2-63f1d28e5704" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/API/Controllers/ProductNutritionController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/DTO/ProductNutritionResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NutriTrack/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Controllers/ProductNutritionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Controllers/ProductNutritionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/DTO/ProductNutritionCategoryResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/DTO/ProductNutritionCategoryResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Data/DbInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Data/DbInitializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="feature/diary-create" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -26,9 +33,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9b415e10f5ba4a949da6625f698e9c5d26a7c0/65/e20993f8/DbSet`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d382df578ec93391918cfaa4ce7f4b8f35c9aed1241d6556dc9be26df13c/IdentityUser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d8d9726f3deb1bbf671f5b791e4dc3e0338219a996f439ad2a69024b825c60/UserManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Controllers/AccountController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/DIPLOMA/NutriTrack/API/Controllers/ProductNutritionController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://E:/DIPLOMA/NutriTrack/API/Data/ApplicationDbContext.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -42,20 +50,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/create-administrating-db",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "FileHeaderTextPageId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/create-administrating-db&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;FileHeaderTextPageId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.NutriTrack: IIS Express">
     <configuration name="NutriTrack: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/API/API.csproj" />
@@ -116,6 +124,9 @@
       <workItem from="1741785753501" duration="1338000" />
       <workItem from="1741791537374" duration="1000" />
       <workItem from="1741895339283" duration="1633000" />
+      <workItem from="1741941499056" duration="8409000" />
+      <workItem from="1741984616033" duration="1460000" />
+      <workItem from="1742059888972" duration="3286000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />
@@ -229,7 +240,47 @@
       <option name="project" value="LOCAL" />
       <updated>1741786222496</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="created product controller and added an endpoint for testing.">
+      <option name="closed" value="true" />
+      <created>1741899908832</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1741899908832</updated>
+    </task>
+    <task id="LOCAL-00016" summary="downloaded automapper and connected">
+      <option name="closed" value="true" />
+      <created>1741899926471</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1741899926471</updated>
+    </task>
+    <task id="LOCAL-00017" summary="added en endpoint to get all product categories">
+      <option name="closed" value="true" />
+      <created>1741943271968</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1741943271968</updated>
+    </task>
+    <task id="LOCAL-00018" summary="added a pagination when user is searching products">
+      <option name="closed" value="true" />
+      <created>1741945349679</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1741945349679</updated>
+    </task>
+    <task id="LOCAL-00019" summary="added crud operations for administrating product's db.">
+      <option name="closed" value="true" />
+      <created>1741953448064</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1741953448064</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -263,6 +314,11 @@
     <MESSAGE value="updated gitignore" />
     <MESSAGE value="added full db-scheme. Added process of creating an initial diary." />
     <MESSAGE value="updated middleware" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated middleware" />
+    <MESSAGE value="created product controller and added an endpoint for testing." />
+    <MESSAGE value="downloaded automapper and connected" />
+    <MESSAGE value="added en endpoint to get all product categories" />
+    <MESSAGE value="added a pagination when user is searching products" />
+    <MESSAGE value="added crud operations for administrating product's db." />
+    <option name="LAST_COMMIT_MESSAGE" value="added crud operations for administrating product's db." />
   </component>
 </project>
