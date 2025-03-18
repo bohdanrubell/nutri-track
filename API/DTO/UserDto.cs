@@ -7,6 +7,6 @@ public class UserDto
     public int Height { get; set; }
     public int Weight { get; set; }
     public string Gender { get; set; }
-    public DateTime DateOfBirth { get; set; }
+    public string DateOfBirth { get; set; }
     public string Token { get; set; }
 }
