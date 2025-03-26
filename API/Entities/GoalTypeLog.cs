@@ -8,4 +8,16 @@ public class GoalTypeLog
     public DateTime Date { get; set; }
     public GoalType Goal { get; set; }
     public User User { get; set; }
+
+    public static GoalTypeLog Create(TimeProvider timeProvider, GoalType goalType, User user)
+    {
+        var goalTypeLog = new GoalTypeLog
+        {
+            Date = timeProvider.GetLocalNow().LocalDateTime,
+            Goal = goalType,
+            User = user
+        };
+
+        return goalTypeLog;
+    }
 }

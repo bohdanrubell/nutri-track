@@ -9,4 +9,15 @@ public class Diary
     public User User { get; set; }
 
     public List<Record> Records { get; set; }
+
+    public static Diary Create(TimeProvider timeProvider, User user)
+    {
+        var diary = new Diary
+        {
+            DateDiaryCreated = timeProvider.GetUtcNow().Date,
+            User = user
+        };
+        
+        return diary;
+    }
 }

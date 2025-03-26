@@ -10,4 +10,16 @@ public class WeightRecord
     public int UserId { get; set; }
 
     public User User { get; set; }
+
+    public static WeightRecord Create(TimeProvider timeProvider, int weight, User user)
+    {
+        var weightRecord = new WeightRecord
+        {
+            DateOfRecordCreated = timeProvider.GetLocalNow().LocalDateTime,
+            Weight = weight,
+            User = user
+        };
+        
+        return weightRecord;
+    }
 }
