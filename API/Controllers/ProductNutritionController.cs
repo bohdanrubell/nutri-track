@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
 using NutriTrack.DTO;
+using NutriTrack.DTO.ProductNutrition;
 using NutriTrack.Entities;
 using NutriTrack.Extensions;
 using NutriTrack.RequestHelpers;
 
 namespace NutriTrack.Controllers;
 
-public class ProductNutritionController : BaseApiController
+[ApiController]
+[Route("api/[controller]")]
+public class ProductNutritionController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -52,6 +55,7 @@ public class ProductNutritionController : BaseApiController
             .Include(p => p.ProductNutritionCategory)
             .Sort(productNutritionParams.OrderBy)
             .Search(productNutritionParams.SearchTerm)
+            .FilterByCategories(productNutritionParams.ProductNutritionCategory)
             .Select(p => new ProductNutritionResponse
             {
                 Id = p.Id,
