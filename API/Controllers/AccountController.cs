@@ -29,27 +29,17 @@ public class AccountController(UserManager<User> userManager, TokenService token
     }
     
     [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+    public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
     {
-        var user = await userManager.FindByNameAsync(loginDto.Username);
-        if (user is null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
+        var user = await _userManager.FindByNameAsync(loginRequest.Username);
+        if (user is null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
             return Unauthorized();
-
-        var latestWeightRecord = await context.WeightRecords
-            .Include(w => w.User)
-            .Where(w => w.User.Id == user.Id)
-            .OrderByDescending(w => w.DateOfRecordCreated)
-            .FirstOrDefaultAsync();
-
-        return new UserDto
+        
+        return new UserResponse
         {
             Id = user.Id,
-            Username = user.UserName,
-            Height = user.Height,
-            Weight = latestWeightRecord?.Weight ?? 0,
-            Gender = user.UserGender.ToString(),
-            DateOfBirth = user.DateOfBirth.Date.ToString("dd/MM/yyyy"),
-            Token = await tokenService.GenerateToken(user)
+            Username = user.UserName!,
+            Token = await _tokenService.GenerateToken(user)
         };
     }
 
