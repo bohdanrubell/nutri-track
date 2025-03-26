@@ -5,15 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
 using NutriTrack.DTO;
+using NutriTrack.DTO.User;
 using NutriTrack.Entities;
 using NutriTrack.Entity;
 using NutriTrack.Entity.Enums;
+using NutriTrack.Exceptions;
 using NutriTrack.Services;
 
 namespace NutriTrack.Controllers;
 
-public class AccountController(UserManager<User> userManager, TokenService tokenService, ApplicationDbContext context)
-    : BaseApiController
+[ApiController]
+[Route("api/[controller]")]
+public class AccountController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
