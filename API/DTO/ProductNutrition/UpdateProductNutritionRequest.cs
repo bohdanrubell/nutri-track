@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NutriTrack.DTO;
+namespace NutriTrack.DTO.ProductNutrition;
 
 public class UpdateProductNutritionRequest
 {

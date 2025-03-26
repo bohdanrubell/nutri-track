@@ -1,4 +1,4 @@
-﻿namespace NutriTrack.DTO;
+﻿namespace NutriTrack.DTO.ProductNutrition;
 
 public class ProductNutritionCategoryResponse
 {

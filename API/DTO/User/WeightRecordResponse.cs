@@ -1,8 +1,7 @@
-﻿namespace NutriTrack.DTO;
+﻿namespace NutriTrack.DTO.User;
 
 public class WeightRecordResponse
 {
-    public int Id { get; set; }
     public string Date { get; set; }
     public int Weight { get; set; }
 }

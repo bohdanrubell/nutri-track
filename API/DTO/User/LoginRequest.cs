@@ -1,6 +1,6 @@
-﻿namespace NutriTrack.DTO;
+﻿namespace NutriTrack.DTO.User;
 
-public class LoginDto
+public class LoginRequest
 {
     public string Username { get; set; }
     public string Password { get; set; }
