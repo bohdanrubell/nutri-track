@@ -94,70 +94,45 @@ public class AccountController(UserManager<User> userManager, TokenService token
 
         return StatusCode(201);
     }
-
-    /*[Authorize(Roles = "User")]
+    
     [HttpGet("profile")]
-    public async Task<ActionResult<UserDto>> GetUserChar()
+    public async Task<ActionResult<UserCharacteristicsResponse>> GetCurrentUserCharacteristics()
     {
-        var user = await userManager.Users
-            .Where(x => x. == User.Identity.)
-
-    }*/
-
-    [Authorize]
-    [HttpGet("profile")]
-    public async Task<ActionResult<UserCharacteristicsResponse>> GetCurrentUser()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
-
-        var userCurrentGoalType = await context.GoalTypeLogs
-            .Include(u => u.User)
-            .Include(goalTypeLog => goalTypeLog.Goal)
-            .Where(u => u.User.Id == user.Id)
-            .OrderByDescending(u => u.Date)
-            .FirstAsync();
-
-        var userCurrentActivityLevel = await context.ActivityLevelLogs
-            .Include(u => u.User)
-            .Include(activityLevelLog => activityLevelLog.ActivityLevel)
-            .Where(u => u.User.Id == user.Id)
-            .OrderByDescending(u => u.Date)
-            .FirstAsync();
-
-        var usersWeightRecords = await context.WeightRecords
-            .Include(w => w.User)
-            .Where(w => w.User.Id == user.Id)
-            .OrderByDescending(w => w.DateOfRecordCreated)
-            .Select(w => new WeightRecordResponse
-            {
-                Id = w.Id,
-                Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
-                Weight = w.Weight,
-            })
-            .ToListAsync();
-
-        var latestWeightRecord = usersWeightRecords.First();
-
-        var age = DateTime.Now.Year - user.DateOfBirth.Year;
-
-        if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
-
-        var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
-            userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
-
-        var dailyNutritionsResponse = new DailyNutritionsResponse
+        try
         {
-            DailyCalories = calculator.CalculateDailyCalories(),
-            DailyProtein = calculator.CalculateDailyProtein(),
-            DailyFat = calculator.CalculateDailyFat(),
-            DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
-        };
+            var user = await _userService.GetUser();
+
+            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+
+            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+
+            var usersWeightRecords = await _context.WeightRecords
+                .Include(w => w.User)
+                .Where(w => w.User.Id == user.Id)
+                .OrderByDescending(w => w.DateOfRecordCreated)
+                .Select(w => new WeightRecordResponse
+                {
+                    Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
+                    Weight = w.Weight,
+                })
+                .ToListAsync();
+
+            var latestWeightRecord = usersWeightRecords.First();
+
+            var age = DateTime.Now.Year - user.DateOfBirth.Year;
+
+            if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
+
+            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
+                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+
+            var dailyNutritionsResponse = new DailyNutritionsResponse
+            {
+                DailyCalories = calculator.CalculateDailyCalories(),
+                DailyProtein = calculator.CalculateDailyProtein(),
+                DailyFat = calculator.CalculateDailyFat(),
+                DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
+            };
 
         var userCharResponse = new UserCharacteristicsResponse
         {
@@ -171,6 +146,29 @@ public class AccountController(UserManager<User> userManager, TokenService token
         };
         
         return Ok(userCharResponse);
+    }
+
+            var userCharResponse = new UserCharacteristicsResponse
+            {
+                Gender = user.UserGender.ToString(),
+                DateOfBirth = user.DateOfBirth.ToString("dd/MM/yyyy"),
+                Age = age,
+                Height = user.Height,
+                CurrentGoalType = userCurrentGoalType.Goal.Name,
+                CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
+                DailyNutritions = dailyNutritionsResponse,
+                WeightRecords = usersWeightRecords
+            };
+            return Ok(userCharResponse);
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return Unauthorized(new {exception.Message} );
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return NotFound(new {exception.Message} );
+        }
     }
 
     private async Task<GoalType?> GetGoalTypeByName(string name)
