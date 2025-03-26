@@ -24,10 +24,10 @@ public static class ProductNutritionExtensions
 
         var lowerCaseSearchTerm = searchTerm.Trim();
 
-        return query.Where(p => p.Name.Contains(lowerCaseSearchTerm, StringComparison.CurrentCultureIgnoreCase));
+        return query.Where(p => p.Name.ToLower().Contains(lowerCaseSearchTerm.ToLower()));
     }
     
-    /*public static IQueryable<ProductNutrition> FilterByCategories(this IQueryable<ProductNutrition> query, string categories)
+    public static IQueryable<ProductNutrition> FilterByCategories(this IQueryable<ProductNutrition> query, string? categories)
     {
         var typeList = new List<string>();
 
@@ -36,5 +36,5 @@ public static class ProductNutritionExtensions
         if (typeList.Count > 0) query = query.Where(p => typeList.Contains(p.ProductNutritionCategory.Name));
 
         return query;
-    }*/
+    }
 }
