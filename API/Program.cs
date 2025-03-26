@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NutriTrack;
 using NutriTrack.Data;
 using NutriTrack.Entities;
 using NutriTrack.Entity;
 using NutriTrack.Middlewares;
+using NutriTrack.RequestHelpers;
 using NutriTrack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,10 +42,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
@@ -82,7 +80,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<UserService>();
 
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

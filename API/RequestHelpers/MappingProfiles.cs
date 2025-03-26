@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using NutriTrack.DTO;
+using NutriTrack.DTO.ProductNutrition;
 using NutriTrack.Entities;
 
-namespace NutriTrack;
+namespace NutriTrack.RequestHelpers;
 
 public class MappingProfiles : Profile
 {
