@@ -44,18 +44,20 @@ public class AccountController(UserManager<User> userManager, TokenService token
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> Register(RegisterDto registerDto)
+    public async Task<ActionResult> Register(RegisterRequest registerRequest, TimeProvider timeProvider)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        
         var user = new User
         {
-            UserName = registerDto.Username,
-            Email = registerDto.Email,
-            UserGender = Enum.Parse<Gender>(registerDto.Gender),
-            DateOfBirth = registerDto.DateOfBirth,
-            Height = registerDto.Height
+            UserName = registerRequest.Username,
+            Email = registerRequest.Email,
+            UserGender = Enum.Parse<Gender>(registerRequest.Gender),
+            DateOfBirth = registerRequest.DateOfBirth,
+            Height = registerRequest.Height
         };
 
-        var result = await userManager.CreateAsync(user, registerDto.Password);
+        var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
         if (!result.Succeeded)
         {
@@ -64,51 +66,31 @@ public class AccountController(UserManager<User> userManager, TokenService token
             return ValidationProblem();
         }
 
-        await userManager.AddToRoleAsync(user, "User");
+        await _userManager.AddToRoleAsync(user, "User");
 
-        var weightRecord = new WeightRecord
-        {
-            DateOfRecordCreated = DateTime.Now.Date,
-            User = user,
-            Weight = registerDto.Weight
-        };
+        var weightRecord = WeightRecord.Create(timeProvider, registerRequest.Weight, user);
+        await _context.WeightRecords.AddAsync(weightRecord);
+        
+        var goal = await GetGoalTypeByName(registerRequest.Goal);
 
-        await context.WeightRecords.AddAsync(weightRecord);
+        if (goal is null) return NotFound($"Ціль {registerRequest.Goal} не знайдено в базі даних");
+        
+        var activityLevel = await GetActivityLevelByName(registerRequest.Activity);
+        
+        if (activityLevel is null) return NotFound($"Ціль {registerRequest.Goal} не знайдено в базі даних");
+        
+        var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
+        await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog);
 
+        var initialActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
+        await _context.ActivityLevelLogs.AddAsync(initialActivityLevelLog);
 
-        var goal = await GetGoalTypeByName(registerDto.Goal);
-        var activityLevel = await GetActivityLevelByName(registerDto.Activity);
-        if (goal == null || activityLevel == null) return NotFound("Goal or activity not found");
+        var initialDiary = Diary.Create(timeProvider, user);
+        await _context.Diaries.AddAsync(initialDiary);
 
-        var initialGoalTypeLog = new GoalTypeLog
-        {
-            Date = DateTime.Now.Date,
-            Goal = goal,
-            User = user
-        };
-
-        await context.GoalTypeLogs.AddAsync(initialGoalTypeLog);
-
-        var initialActivityLevelLog = new ActivityLevelLog
-        {
-            Date = DateTime.Now.Date,
-            ActivityLevel = activityLevel,
-            User = user
-        };
-
-        await context.ActivityLevelLogs.AddAsync(initialActivityLevelLog);
-
-        var initialDiary = new Diary
-        {
-            DateDiaryCreated = DateTime.Now.Date,
-            User = user
-        };
-
-        await context.Diaries.AddAsync(initialDiary);
-
-        await context.SaveChangesAsync();
-
-        Console.WriteLine($"User {user.UserName} with id: {user.Id} has been created");
+        await _context.SaveChangesAsync();
+        
+        await transaction.CommitAsync();
 
         return StatusCode(201);
     }
