@@ -134,20 +134,6 @@ public class AccountController(UserManager<User> userManager, TokenService token
                 DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
             };
 
-        var userCharResponse = new UserCharacteristicsResponse
-        {
-            Sex = user.UserGender.ToString(),
-            Age = age,
-            Height = user.Height,
-            CurrentGoalType = userCurrentGoalType.Goal.Name,
-            CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
-            DailyNutritions = dailyNutritionsResponse,
-            WeightRecords = usersWeightRecords
-        };
-        
-        return Ok(userCharResponse);
-    }
-
             var userCharResponse = new UserCharacteristicsResponse
             {
                 Gender = user.UserGender.ToString(),
@@ -171,6 +157,56 @@ public class AccountController(UserManager<User> userManager, TokenService token
         }
     }
 
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<ActionResult> UpdateUserProfile(UpdateUserProfileRequest request, TimeProvider timeProvider, CancellationToken cancellationToken)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId == null) return NotFound("Користувач не авторизований.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null) return NotFound("Користувача не знайдено.");
+        
+        user.UserGender = Enum.Parse<Gender>(request.Gender);
+        user.Height = request.Height;
+
+        var goal = await GetGoalTypeByName(request.CurrentGoalType);
+
+        if (goal is null) return NotFound($"Ціль {request.CurrentGoalType} не знайдено в базі даних");
+        
+        var activityLevel = await GetActivityLevelByName(request.CurrentActivityLevel);
+        
+        if (activityLevel is null) return NotFound($"Ціль {request.CurrentActivityLevel} не знайдено в базі даних");
+
+        var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+
+        var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+
+        if (userCurrentActivityLevel.ActivityLevel.Name != request.CurrentActivityLevel)
+        {
+            var newActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
+            await _context.ActivityLevelLogs.AddAsync(newActivityLevelLog, cancellationToken);
+        }
+        
+        if (userCurrentGoalType.Goal.Name != request.CurrentGoalType)
+        {
+            var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
+            await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
+        }
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        await _userManager.UpdateAsync(user);
+        
+        await transaction.CommitAsync(cancellationToken);
+        
+        return NoContent();
+    }
+    
     private async Task<GoalType?> GetGoalTypeByName(string name)
     {
         return await context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
