@@ -247,13 +247,39 @@ public class AccountController(UserManager<User> userManager, TokenService token
         };
     }
     
+    [HttpGet("activityLevels")] 
+    public async Task<ActionResult<List<ActivityLevelResponse>>> GetActivityLevels(CancellationToken ct)
+    {
+        var activityLevels = await _context.ActivityLevels
+            .Select(a => new ActivityLevelResponse
+            {
+                Id = a.Id,
+                Name = a.Name
+            }).ToListAsync(ct);
+        
+        return Ok(activityLevels);
+    }
+    
+    [HttpGet("goalTypes")] 
+    public async Task<ActionResult<List<GoalTypeResponse>>> GetGoalTypes(CancellationToken ct)
+    {
+        var goalTypes = await _context.GoalTypes
+            .Select(g => new GoalTypeResponse
+            {
+                Id = g.Id,
+                Name = g.Name
+            }).ToListAsync(ct);
+        
+        return Ok(goalTypes);
+    }
+    
     private async Task<GoalType?> GetGoalTypeByName(string name)
     {
-        return await context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
+        return await _context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
     }
 
     private async Task<ActivityLevel?> GetActivityLevelByName(string name)
     {
-        return await context.ActivityLevels.FirstOrDefaultAsync(g => g.Name == name);
+        return await _context.ActivityLevels.FirstOrDefaultAsync(g => g.Name == name);
     }
 }
