@@ -15,6 +15,19 @@ namespace NutriTrack.Controllers;
 public class AccountController(UserManager<User> userManager, TokenService tokenService, ApplicationDbContext context)
     : BaseApiController
 {
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
+    private readonly TokenService _tokenService;
+    private readonly UserService _userService;
+    
+    public AccountController(ApplicationDbContext context, UserManager<User> userManager, TokenService tokenService, UserService userService)
+    {
+        _context = context;
+        _userManager = userManager;
+        _tokenService = tokenService;
+        _userService = userService;
+    }
+    
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
