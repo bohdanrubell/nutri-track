@@ -207,6 +207,26 @@ public class AccountController(UserManager<User> userManager, TokenService token
         return NoContent();
     }
     
+    
+    [Authorize]
+    [HttpPost("addWeightRecord")]
+    public async Task<ActionResult> AddNewWeightRecord(TimeProvider timeProvider, WeightRecordRequest request ,CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId == null) return NotFound("Користувач не авторизований.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null) return NotFound("Користувача не знайдено.");
+        
+        var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
+        await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return NoContent();
+    }
+    
     private async Task<GoalType?> GetGoalTypeByName(string name)
     {
         return await context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
