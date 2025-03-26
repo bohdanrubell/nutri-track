@@ -227,6 +227,26 @@ public class AccountController(UserManager<User> userManager, TokenService token
         return NoContent();
     }
     
+    [Authorize]
+    [HttpGet("currentUser")]
+    public async Task<ActionResult<UserResponse>> GetCurrentUser()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId == null) return NotFound("Користувач не авторизований.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null) return NotFound("Користувача не знайдено.");
+        
+        return new UserResponse
+        {
+            Id = user.Id,
+            Username = user.UserName!,
+            Token = await _tokenService.GenerateToken(user),
+        };
+    }
+    
     private async Task<GoalType?> GetGoalTypeByName(string name)
     {
         return await context.GoalTypes.FirstOrDefaultAsync(g => g.Name == name);
