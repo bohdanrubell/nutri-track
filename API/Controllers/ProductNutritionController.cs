@@ -25,10 +25,20 @@ public class ProductNutritionController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductNutrition>> GetProductNutrition(int id)
+    public async Task<ActionResult<ProductNutritionResponse>> GetProductNutrition(int id)
     {
         var productNutrition = await _context.ProductNutritions
             .Where(n => n.Id == id)
+            .Select(p => new ProductNutritionResponse
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Calories = p.CaloriesPer100Grams,
+                Protein = p.ProteinPer100Grams,
+                Fat = p.FatPer100Grams,
+                Carbohydrates = p.CarbohydratesPer100Grams,
+                Category = p.ProductNutritionCategory.Name
+            })
             .FirstOrDefaultAsync();
 
         if (productNutrition == null) return NotFound();

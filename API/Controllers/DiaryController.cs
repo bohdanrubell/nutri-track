@@ -79,7 +79,7 @@ public class DiaryController : ControllerBase
     
     [Authorize]
     [HttpPost("addNewProductRecord")]
-    public async Task<ActionResult> AddProductToRecord([FromBody] ProductRecordRequest productRecordRequest)
+    public async Task<ActionResult> AddProductToRecord(ProductRecordRequest productRecordRequest)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
