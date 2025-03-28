@@ -103,7 +103,7 @@ public class AccountController : ControllerBase
     {
         try
         {
-            var user = await _userService.GetUser();
+            var user = await _userService.GetUserAsync();
 
             var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
 
