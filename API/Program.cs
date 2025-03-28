@@ -108,8 +108,7 @@ var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 try
-{   
-    await context.Database.MigrateAsync();
+{  
     await DbInitializer.Initialize(context, userManager);
 }
 catch (Exception ex)
