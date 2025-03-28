@@ -5,6 +5,7 @@ import {store} from "../store/store.ts";
 import {RegisterFormData} from "../models/registerFormData.ts";
 import LoginFormData from "../models/loginFormData.ts";
 import {ProfileFormData} from "../models/profileHelpers.ts";
+import ProductRecordForm from "../models/dailyRecord.ts";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
@@ -54,6 +55,7 @@ axios.interceptors.response.use(async response => {
 const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(responseBody),
     put: (url: string, body: object) => axios.put(url, body).then(responseBody),
+    delete: (url: string) => axios.delete(url).then(responseBody),
     post: (url: string, body: object) => axios.post(url, body).then(responseBody)
 }
 
@@ -73,9 +75,16 @@ const ProductNutrition = {
     fetchCategories: () => requests.get('productNutrition/categories'),
 }
 
+const Diary = {
+    getRecordByDate: (date: string) => requests.get(`diary/getRecordByDate/${date}`),
+    updateProductRecord: (value: ProductRecordForm) => requests.put('diary/updateProductRecord', value),
+    deleteProductRecord: (id: number) => requests.delete(`diary/deleteProductRecord/${id}`)
+}
+
 const api = {
     Account,
-    ProductNutrition
+    ProductNutrition,
+    Diary
 }
 
 export default api;
