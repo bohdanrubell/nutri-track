@@ -20,7 +20,7 @@ public class UserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<User> GetUser()
+    public async Task<User> GetUserAsync()
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
