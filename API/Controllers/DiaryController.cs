@@ -33,7 +33,7 @@ public class DiaryController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("getRecordByDate")]
+    [HttpGet("getRecordByDate/{date}")]
     public async Task<ActionResult<DairyRecordResponse>> GetRecordByDate(DateTime date)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -51,7 +51,7 @@ public class DiaryController : ControllerBase
             .FirstOrDefaultAsync();
 
         if (record == null)
-            return NotFound("Запису за вказану дату не знайдено.");
+            return NotFound();
 
         var recordResponse = new DairyRecordResponse
         {
@@ -174,7 +174,7 @@ public class DiaryController : ControllerBase
     {
         try
         {
-            var user = _userService.GetUser();
+            var user = await _userService.GetUserAsync();
 
             var product = await _context.ProductRecords
                 .Include(p => p.Record)
