@@ -28,9 +28,9 @@ public class Record
         {
             Date = timeProvider.GetUtcNow().Date,
             DailyCalories = dailyCalories,
-            DailyProtein = dailyProtein,
-            DailyFat = dailyFat,
-            DailyCarbohydrates = dailyCarbohydrates,
+            DailyProtein = Math.Round(dailyProtein, 2),
+            DailyFat = Math.Round(dailyFat,2),
+            DailyCarbohydrates = Math.Round(dailyCarbohydrates,2),
             Diary = diary,
             ActivityLog = activityLog,
             GoalLog = goalLog,

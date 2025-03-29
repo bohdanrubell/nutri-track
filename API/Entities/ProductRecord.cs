@@ -16,7 +16,7 @@ public class ProductRecord
     {
         var productRecord = new ProductRecord
         {
-            Grams = grams,
+            Grams = Math.Round(grams, 2),
             ProductNutrition = productNutrition,
             Record = record
         };
