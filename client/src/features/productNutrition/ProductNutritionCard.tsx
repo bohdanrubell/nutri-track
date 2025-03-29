@@ -3,18 +3,45 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardMedia,
+    CardMedia, Dialog, DialogActions, DialogContent, DialogTitle,
     Typography
 } from "@mui/material";
 import { Link } from 'react-router-dom';
 import { ProductNutrition } from "../../app/models/productNutrition";
+import {useState} from "react";
+import TextField from "@mui/material/TextField";
+import api from "../../app/api/api.ts";
+import {toast} from "react-toastify";
 
 interface Properties {
     product: ProductNutrition;
 }
 
+
+
 export default function ProductNutritionCard({ product }: Properties) {
+    const [open, setOpen] = useState(false);
+    const [grams, setGrams] = useState(100);
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            await api.Diary.addProductRecord({
+                productNutritionId: product.id,
+                consumedGrams: grams
+            });
+            setOpen(false);
+            setGrams(100);
+        } catch {
+            toast.error("Помилка при додаванні продукту до щоденнику!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
+        <>
         <Card sx={{ maxWidth: 250, p: 1, textAlign: 'center' }}>
             <Typography
                 variant="subtitle1"
@@ -53,7 +80,44 @@ export default function ProductNutritionCard({ product }: Properties) {
                 >
                     Детальніше
                 </Button>
+                <Button
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => setOpen(true)}
+                >
+                    Додати
+                </Button>
             </CardActions>
         </Card>
+
+            <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Скільки грамів бажаєте додати?</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Грами"
+                        type="number"
+                        fullWidth
+                        value={grams}
+                        onChange={(e) => setGrams(Number(e.target.value))}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)} disabled={loading}>
+                        Скасувати
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? 'Додається...' : 'Додати'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }
