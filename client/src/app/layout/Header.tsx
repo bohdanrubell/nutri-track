@@ -2,11 +2,9 @@ import { AppBar, Box, List, ListItem, Toolbar, Typography } from "@mui/material"
 import { NavLink } from 'react-router-dom';
 import { useAppSelector } from '../store/store.ts';
 import UserMenu from "./UserMenu.tsx";
-
-const midLinks = [
-    { title: 'Продукти', path: '/productNutrition' },
-    { title: 'Про нас', path: '/about' },
-]
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import StorageIcon from '@mui/icons-material/Storage';
 
 const rightLinks = [
     { title: 'Авторизація', path: '/login' },
@@ -16,15 +14,15 @@ const rightLinks = [
 const navLinkStyles = {
     color: 'inherit',
     textDecoration: 'none',
+    whiteSpace: 'nowrap',
     typography: 'h6',
     '&:hover': {
-        color: 'grey.500'
+        color: 'grey.400'
     },
     '&.active': {
         color: 'text.secondary'
     }
 }
-
 
 export default function Header() {
     const {user} = useAppSelector(state => state.account);
@@ -32,7 +30,12 @@ export default function Header() {
     return (
         <AppBar position='static' sx={{ mb: 4 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box display='flex' alignItems='center'>
+                <Box display='flex' alignItems='center' gap={1}>
+                    <img
+                        src='/images/icon.png'
+                        alt='logo'
+                        style={{width: 32, height: 32}}
+                    />
                     <Typography
                         variant='h6'
                         component={NavLink}
@@ -43,30 +46,38 @@ export default function Header() {
                     </Typography>
                 </Box>
 
-                <List sx={{ display: 'flex' }}>
-                    {midLinks.map(({ title, path }) => (
-                        <ListItem
-                            component={NavLink}
-                            to={path}
-                            key={path}
-                            sx={navLinkStyles}
-                        >
-                            {title.toUpperCase()}
-                        </ListItem>
-                    ))}
+                <List sx={{display: 'flex'}}>
+                    <ListItem
+                        component={NavLink}
+                        to={'/productNutrition'}
+                        sx={navLinkStyles}
+                    >
+                        <StorageIcon/>
+                        База продуктів
+                    </ListItem>
                     {user  &&
-                        <ListItem
-                            component={NavLink}
-                            to={'/diary'}
-                            sx={navLinkStyles}
-                        >
-                            Щоденник
-                        </ListItem>
+                        <>
+                            <ListItem
+                                component={NavLink}
+                                to={'/diary'}
+                                sx={navLinkStyles}
+                            >
+                                <MenuBookIcon/>
+                                Щоденник
+                            </ListItem>
+                            <ListItem
+                                component={NavLink}
+                                to={'/statistics'}
+                                sx={navLinkStyles}
+                            >
+                                <AnalyticsIcon/>
+                                Відомість
+                            </ListItem>
+                        </>
                     }
                 </List>
 
                 <Box display='flex' alignItems='center'>
-
                     {user ? (
                         <UserMenu />
                     ) : (
