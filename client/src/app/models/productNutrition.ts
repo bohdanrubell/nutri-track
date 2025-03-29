@@ -18,3 +18,8 @@ export interface ProductNutritionParams {
 export interface ProductNutritionCategory{
     name: string
 }
+
+export default interface ProductRecordNew{
+    productNutritionId: number;
+    consumedGrams: number;
+}

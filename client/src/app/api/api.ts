@@ -6,6 +6,7 @@ import {RegisterFormData} from "../models/registerFormData.ts";
 import LoginFormData from "../models/loginFormData.ts";
 import {ProfileFormData} from "../models/profileHelpers.ts";
 import ProductRecordForm from "../models/dailyRecord.ts";
+import ProductRecordNew from "../models/productNutrition.ts";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
@@ -72,13 +73,16 @@ const Account = {
 
 const ProductNutrition = {
     list: (params: URLSearchParams) => requests.get('productNutrition', params),
+    getProductById: (id: number) => requests.get(`productNutrition/${id}`),
     fetchCategories: () => requests.get('productNutrition/categories'),
 }
 
 const Diary = {
+    addProductRecord: (value: ProductRecordNew) => requests.post('diary/addNewProductRecord',value),
     getRecordByDate: (date: string) => requests.get(`diary/getRecordByDate/${date}`),
     updateProductRecord: (value: ProductRecordForm) => requests.put('diary/updateProductRecord', value),
-    deleteProductRecord: (id: number) => requests.delete(`diary/deleteProductRecord/${id}`)
+    deleteProductRecord: (id: number) => requests.delete(`diary/deleteProductRecord/${id}`),
+    getStatisticsByPeriod: (period: string) => requests.get(`diary/getStatisticsByPeriod/${period}`),
 }
 
 const api = {
