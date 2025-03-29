@@ -2,9 +2,10 @@
 
 public class PeriodStatisticsResponse
 {
-    public DateTime Date { get; set; }
-    public double Calories { get; set; }
-    public double Proteins { get; set; }
-    public double Fats { get; set; }
-    public double Carbohydrates { get; set; }
+    public string Date { get; set; }
+    public int ConsumedCalories { get; set; }
+    public double ConsumedProteins { get; set; }
+    public double ConsumedFats { get; set; }
+    public double ConsumedCarbohydrates { get; set; }
+    public string Status { get; set; }
 }
