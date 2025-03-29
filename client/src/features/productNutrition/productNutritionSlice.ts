@@ -7,7 +7,6 @@ import {ProductNutrition, ProductNutritionCategory, ProductNutritionParams} from
 export enum ProductStatus {
     Idle = 'idle',
     Loading = 'loading',
-    Success = 'success',
     Error = 'error'
 }
 
@@ -41,7 +40,6 @@ function getParamsForServer(productParams: ProductNutritionParams) {
     return params;
 }
 
-
 export const fetchProductsAsync = createAsyncThunk<ProductNutrition[], void, { state: RootState }>(
     'productNutrition/fetchProductsAsync',
     async (_, thunkAPI) => {
@@ -52,6 +50,17 @@ export const fetchProductsAsync = createAsyncThunk<ProductNutrition[], void, { s
             return response.items;
         } catch (error: any) {
             return thunkAPI.rejectWithValue({error: error.data})
+        }
+    }
+)
+
+export const fetchProductAsync = createAsyncThunk<ProductNutrition, number>(
+    'productNutrition/fetchProductAsync',
+    async (productId, thunkAPI) => {
+        try {
+            return await api.ProductNutrition.getProductById(productId);
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue({ error: error.data })
         }
     }
 )
@@ -109,14 +118,18 @@ export const productNutritionSlice = createSlice({
     extraReducers: (builder => {
         builder.addCase(fetchProductsAsync.fulfilled, (state, action) => {
             adapter.setAll(state, action.payload);
-            state.status = ProductStatus.Success;
+            state.status = ProductStatus.Idle;
             state.productsLoaded = true;
         });
         builder.addCase(fetchCategories.fulfilled, (state, action) => {
             state.categories = action.payload;
-            state.status = ProductStatus.Success;
+            state.status = ProductStatus.Idle;
             state.categoriesLoaded = true;
         });
+        builder.addCase(fetchProductAsync.fulfilled , (state, action) => {
+            adapter.upsertOne(state, action.payload);
+            state.status = ProductStatus.Idle;
+        })
         builder.addMatcher(
             (action) => action.type.endsWith('/pending'),
             (state) => {
