@@ -5,8 +5,7 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    IconButton,
-    Paper,
+    IconButton, Paper,
     Table,
     TableBody,
     TableCell,
@@ -118,48 +117,48 @@ export default function Diary() {
                                 />
                             </Grid>
                         </Grid>
-                        <Paper elevation={5}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>№</TableCell>
-                                        <TableCell>Назва продукту</TableCell>
-                                        <TableCell>Ккал</TableCell>
-                                        <TableCell>Білки</TableCell>
-                                        <TableCell>Жири</TableCell>
-                                        <TableCell>Вуглеводи</TableCell>
-                                        <TableCell>Кількість</TableCell>
-                                        <TableCell align="center">Дії</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {dailyRecord.productRecords.map((product, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{product.name}</TableCell>
-                                            <TableCell>{product.calories}</TableCell>
-                                            <TableCell>{product.protein}</TableCell>
-                                            <TableCell>{product.fat}</TableCell>
-                                            <TableCell>{product.carbohydrates}</TableCell>
-                                            <TableCell>{product.grams}</TableCell>
-                                            <TableCell align="center">
-                                                <IconButton
-                                                    color="primary"
-                                                    onClick={() => handleEditClick(product.id, product.grams)}
-                                                >
-                                                    <EditIcon/>
-                                                </IconButton>
-                                                <IconButton
-                                                    color="error"
-                                                    onClick={() => handleDeleteClick(product.id)}
-                                                >
-                                                    <DeleteIcon/>
-                                                </IconButton>
-                                            </TableCell>
+                        <Paper elevation={5} sx={{maxHeight: 400,  overflow: 'auto'}}>
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>№</TableCell>
+                                            <TableCell>Назва продукту</TableCell>
+                                            <TableCell>Ккал</TableCell>
+                                            <TableCell>Білки</TableCell>
+                                            <TableCell>Жири</TableCell>
+                                            <TableCell>Вуглеводи</TableCell>
+                                            <TableCell>Кількість(г)</TableCell>
+                                            <TableCell align="center">Дії</TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHead>
+                                    <TableBody>
+                                        {dailyRecord.productRecords.map((product, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{product.name}</TableCell>
+                                                <TableCell>{product.calories}</TableCell>
+                                                <TableCell>{product.protein}</TableCell>
+                                                <TableCell>{product.fat}</TableCell>
+                                                <TableCell>{product.carbohydrates}</TableCell>
+                                                <TableCell>{product.grams}</TableCell>
+                                                <TableCell align="center">
+                                                    <IconButton
+                                                        color="primary"
+                                                        onClick={() => handleEditClick(product.id, product.grams)}
+                                                    >
+                                                        <EditIcon/>
+                                                    </IconButton>
+                                                    <IconButton
+                                                        color="error"
+                                                        onClick={() => handleDeleteClick(product.id)}
+                                                    >
+                                                        <DeleteIcon/>
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                         </Paper>
                     </>
                 ) : (
