@@ -9,6 +9,7 @@ using NutriTrack.DTO.ProductRecord;
 using NutriTrack.DTO.Statistics;
 using NutriTrack.DTO.User;
 using NutriTrack.Entities;
+using NutriTrack.Entities.Enums;
 using NutriTrack.Exceptions;
 using NutriTrack.Services;
 
@@ -45,12 +46,11 @@ public class DiaryController : ControllerBase
         if (user == null) return NotFound("Користувача не знайдено.");
 
         var record = await _context.Records
-            .Where(r => r.Diary.User.Id == user.Id && r.Date.Date == date.Date)
             .Include(r => r.ProductRecords)
             .ThenInclude(pr => pr.ProductNutrition)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(r => r.Diary.User.Id == user.Id && r.Date.Date == date.Date);
 
-        if (record == null)
+        if (record is null)
             return NotFound();
 
         var recordResponse = new DairyRecordResponse
@@ -66,17 +66,17 @@ public class DiaryController : ControllerBase
             {
                 Id = pr.Id,
                 Name = pr.ProductNutrition.Name,
-                Grams = pr.Grams,
-                Calories = pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100,
-                Protein = pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100,
-                Fat = pr.ProductNutrition.FatPer100Grams * pr.Grams / 100,
-                Carbohydrates = pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100
+                Grams = Math.Round(pr.Grams, 2),
+                Calories = (int)Math.Round(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
+                Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100, 2),
+                Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100, 2),
+                Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100, 2)
             }).ToList()
         };
 
         return Ok(recordResponse);
     }
-    
+
     [Authorize]
     [HttpPost("addNewProductRecord")]
     public async Task<ActionResult> AddProductToRecord(ProductRecordRequest productRecordRequest)
@@ -159,16 +159,14 @@ public class DiaryController : ControllerBase
                 p.Id == productRecordRequest.ProductRecordId && p.Record.Diary.User.Id == user.Id);
 
         if (product is null) return NotFound("Продукт не знайдено");
-        
-        product.Grams = productRecordRequest.ConsumedGrams;
-        
+
+        product.Grams = Math.Round(productRecordRequest.ConsumedGrams, 2);
+
         await _context.SaveChangesAsync();
-        
+
         return NoContent();
     }
 
-
-    [Authorize]
     [HttpDelete("deleteProductRecord/{id}")]
     public async Task<ActionResult> DeleteProductRecord(int id)
     {
@@ -199,43 +197,116 @@ public class DiaryController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("getStatisticsPeriodByPeriod")]
-    public async Task<ActionResult<List<PeriodStatisticsResponse>>> GetStatisticsByPeriodAsync([FromForm]ConsumptionPeriodRequest period)
+    [HttpGet("getStatisticsByPeriod/{period}")]
+    public async Task<ActionResult<List<PeriodStatisticsResponse>>> GetStatisticsByPeriodAsync(string period)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+        try
+        {
+            var user = await _userService.GetUserAsync();
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return NotFound("User not found.");
+            var today = DateTime.Today;
+            DateTime startDate, endDate;
 
-        var lastActivity = await _userService.GetLastUserActivityLevelLog(user.Id);
-        var lastGoal = await _userService.GetLastUsersGoalTypeLog(user.Id);
-        
-        var records = await _context.Records
-            .Include(r => r.ProductRecords)
-            .ThenInclude(pr => pr.ProductNutrition)
-            .Where(r =>
-                r.Date >= period.StartOfPeriod &&
-                r.Date <= period.EndOfPeriod &&
-                r.ActivityLog.ActivityId == lastActivity.ActivityId &&
-                r.GoalLog.GoalTypeId == lastGoal.GoalTypeId)
-            .ToListAsync();
-
-        var dailyStats = records
-            .GroupBy(r => r.Date.Date)
-            .Select(g => new PeriodStatisticsResponse
+            switch (period.ToLower())
             {
-                Date = g.Key,
-                Calories = g.SelectMany(r => r.ProductRecords).Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CaloriesPer100Grams),
-                Proteins = g.SelectMany(r => r.ProductRecords).Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.ProteinPer100Grams),
-                Fats = g.SelectMany(r => r.ProductRecords).Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.FatPer100Grams),
-                Carbohydrates = g.SelectMany(r => r.ProductRecords).Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CarbohydratesPer100Grams)
-            })
-            .OrderBy(d => d.Date)
-            .ToList();
+                case "last3days":
+                    startDate = today.AddDays(-2);
+                    endDate = today;
+                    break;
 
-        return Ok(dailyStats);
+                case "currentweek":
+                    var dow = (int)today.DayOfWeek;
+                    var currentWeekStart = today.AddDays(-(dow == 0 ? 6 : dow - 1));
+                    startDate = currentWeekStart;
+                    endDate = today;
+                    break;
+
+                case "previousweek":
+                    var d = (int)today.DayOfWeek;
+                    var thisWeekStart = today.AddDays(-(d == 0 ? 6 : d - 1));
+                    startDate = thisWeekStart.AddDays(-7);
+                    endDate = thisWeekStart.AddDays(-1);
+                    break;
+
+                default:
+                    return BadRequest("Invalid period");
+            }
+
+            var records = await _context.Records
+                .Include(r => r.ProductRecords)
+                .ThenInclude(pr => pr.ProductNutrition)
+                .Where(r => r.Date >= startDate && r.Date <= endDate && r.Diary.User.Id == user.Id)
+                .ToListAsync();
+
+            var dailyStats = records
+                .GroupBy(r => r.Date.Date)
+                .Select(g =>
+                {
+                    var calories = g.SelectMany(r => r.ProductRecords)
+                        .Sum(pr => (int)Math.Round(pr.Grams / 100.0 * pr.ProductNutrition.CaloriesPer100Grams));
+                    var proteins = g.SelectMany(r => r.ProductRecords)
+                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.ProteinPer100Grams);
+                    var fats = g.SelectMany(r => r.ProductRecords)
+                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.FatPer100Grams);
+                    var carbs = g.SelectMany(r => r.ProductRecords)
+                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CarbohydratesPer100Grams);
+
+                    var first = g.First();
+
+                    var status = GetNormStatus(
+                        calories, first.DailyCalories,
+                        proteins, first.DailyProtein,
+                        fats, first.DailyFat,
+                        carbs, first.DailyCarbohydrates
+                    );
+
+                    return new PeriodStatisticsResponse
+                    {
+                        Date = g.Key.ToString("yyyy-MM-dd"),
+                        ConsumedCalories = calories,
+                        ConsumedProteins = Math.Round(proteins, 2),
+                        ConsumedFats = Math.Round(fats,2),
+                        ConsumedCarbohydrates = Math.Round(carbs, 2),
+                        Status = status.ToString()
+                    };
+                })
+                .OrderBy(d => d.Date)
+                .ToList();
+
+            return Ok(dailyStats);
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return Unauthorized(new { exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return NotFound(new { exception.Message });
+        }
     }
 
+    private static NormStatus GetNormStatus(
+        int calories, int normCalories,
+        double proteins, double normProteins,
+        double fats, double normFats,
+        double carbs, double normCarbohydrates)
+    {
+        var okCalories = calories >= normCalories;
+        var okProteins = proteins >= normProteins;
+        var okFats = fats >= normFats;
+        var okCarbs = carbs >= normCarbohydrates;
 
+        var overCalories = calories > normCalories * 1.15;
+        var overProteins = proteins > normProteins * 1.15;
+        var overFats = fats > normFats * 1.15;
+        var overCarbs = carbs > normCarbohydrates * 1.15;
+
+        if (overCalories || overProteins || overFats || overCarbs)
+            return NormStatus.Exceeded;
+
+        if (okCalories && okProteins && okFats && okCarbs)
+            return NormStatus.Reached;
+
+        return NormStatus.NotReached;
+    }
 }
