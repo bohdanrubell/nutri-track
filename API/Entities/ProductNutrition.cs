@@ -10,6 +10,8 @@ public class ProductNutrition
     public double FatPer100Grams { get; set; }
     public double CarbohydratesPer100Grams { get; set; }
 
+    public string? ImageUrl { get; set; }
+
     public ProductNutritionCategory ProductNutritionCategory { get; set; }
     
     public List<ProductRecord> ProductRecords { get; set; }

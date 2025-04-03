@@ -8,6 +8,7 @@ using NutriTrack.DTO.ProductNutrition;
 using NutriTrack.Entities;
 using NutriTrack.Extensions;
 using NutriTrack.RequestHelpers;
+using NutriTrack.Services;
 
 namespace NutriTrack.Controllers;
 
@@ -16,12 +17,14 @@ namespace NutriTrack.Controllers;
 public class ProductNutritionController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly ImageService _imageService;
     private readonly IMapper _mapper;
 
-    public ProductNutritionController(ApplicationDbContext context, IMapper mapper)
+    public ProductNutritionController(ApplicationDbContext context, IMapper mapper, ImageService imageService)
     {
         _context = context;
         _mapper = mapper;
+        _imageService = imageService;
     }
 
     [HttpGet("{id}")]
@@ -33,11 +36,12 @@ public class ProductNutritionController : ControllerBase
             {
                 Id = p.Id,
                 Name = p.Name,
-                Calories = p.CaloriesPer100Grams,
-                Protein = p.ProteinPer100Grams,
-                Fat = p.FatPer100Grams,
-                Carbohydrates = p.CarbohydratesPer100Grams,
-                Category = p.ProductNutritionCategory.Name
+                CaloriesPer100Grams = p.CaloriesPer100Grams,
+                ProteinPer100Grams = p.ProteinPer100Grams,
+                FatPer100Grams = p.FatPer100Grams,
+                CarbohydratesPer100Grams = p.CarbohydratesPer100Grams,
+                CategoryName = p.ProductNutritionCategory.Name,
+                ImageId = p.ImageUrl
             })
             .FirstOrDefaultAsync();
 
@@ -70,11 +74,12 @@ public class ProductNutritionController : ControllerBase
             {
                 Id = p.Id,
                 Name = p.Name,
-                Calories = p.CaloriesPer100Grams,
-                Protein = p.ProteinPer100Grams,
-                Carbohydrates = p.CarbohydratesPer100Grams,
-                Fat = p.FatPer100Grams,
-                Category = p.ProductNutritionCategory.Name,
+                CaloriesPer100Grams = p.CaloriesPer100Grams,
+                ProteinPer100Grams = p.ProteinPer100Grams,
+                CarbohydratesPer100Grams = p.CarbohydratesPer100Grams,
+                FatPer100Grams = p.FatPer100Grams,
+                CategoryName = p.ProductNutritionCategory.Name,
+                ImageId = p.ImageUrl
             })
             .AsQueryable();
 
@@ -89,7 +94,7 @@ public class ProductNutritionController : ControllerBase
     
     [Authorize(Roles = "Admin")]
     [HttpPost("create")]
-    public async Task<ActionResult<ProductNutrition>> CreateProductNutrition(CreateProductNutritionRequest request)
+    public async Task<ActionResult<ProductNutritionResponse>> CreateProductNutrition([FromForm]CreateProductNutritionRequest request)
     {
         var newProduct = _mapper.Map<ProductNutrition>(request);
 
@@ -101,11 +106,32 @@ public class ProductNutritionController : ControllerBase
         
         newProduct.ProductNutritionCategory = category;
         
+        string? imageUrl = null;
+
+        if (request.File != null)
+        {
+            imageUrl = await _imageService.UploadImageAsync(request.File);
+        }
+        
+        newProduct.ImageUrl = imageUrl;
+        
         await _context.ProductNutritions.AddAsync(newProduct);
 
         var result = await _context.SaveChangesAsync() > 0;
-
-        if (result) return Created();
+        
+        var productResponse = new ProductNutritionResponse
+        {
+            Id = newProduct.Id,
+            Name = newProduct.Name,
+            CaloriesPer100Grams = newProduct.CaloriesPer100Grams,
+            ProteinPer100Grams = newProduct.ProteinPer100Grams,
+            CarbohydratesPer100Grams = newProduct.CarbohydratesPer100Grams,
+            FatPer100Grams = newProduct.FatPer100Grams,
+            CategoryName = newProduct.ProductNutritionCategory.Name,
+            ImageId = newProduct.ImageUrl
+        };
+        
+        if (result) return Ok(productResponse);
 
         return BadRequest("Problem creating new product");
     }
@@ -128,6 +154,12 @@ public class ProductNutritionController : ControllerBase
         if (category == null) return NotFound("Category not found");
         
         updatedProduct.ProductNutritionCategory = category;
+        
+        if (request.File != null)
+        {
+            var imageUrl = await _imageService.UploadImageAsync(request.File);
+            updatedProduct.ImageUrl = imageUrl;
+        }
         
         var result = await _context.SaveChangesAsync() > 0;
 

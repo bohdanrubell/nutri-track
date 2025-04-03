@@ -17,4 +17,6 @@ public class UpdateProductNutritionRequest
     public int FatPer100Grams { get; set; }
     [Required]
     public int CarbohydratesPer100Grams { get; set; }
+
+    public IFormFile? File { get; set; }
 }

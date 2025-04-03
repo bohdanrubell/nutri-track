@@ -1,12 +1,14 @@
-﻿namespace NutriTrack.DTO;
+﻿namespace NutriTrack.DTO.ProductNutrition;
 
 public class ProductNutritionResponse
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public int Calories { get; set; }
-    public double Protein { get; set; }
-    public double Fat { get; set; }
-    public double Carbohydrates { get; set; }
-    public string Category { get; set; }
+    public int CaloriesPer100Grams { get; set; }
+    public double ProteinPer100Grams { get; set; }
+    public double FatPer100Grams { get; set; }
+    public double CarbohydratesPer100Grams { get; set; }
+    public string CategoryName { get; set; }
+
+    public string ImageId { get; set; }
 }

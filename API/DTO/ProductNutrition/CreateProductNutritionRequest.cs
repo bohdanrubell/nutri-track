@@ -8,4 +8,6 @@ public class CreateProductNutritionRequest
     public int ProteinPer100Grams { get; set; }
     public int FatPer100Grams { get; set; }
     public int CarbohydratesPer100Grams { get; set; }
+
+    public IFormFile? File { get; set; }
 }
