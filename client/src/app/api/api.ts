@@ -57,7 +57,10 @@ const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(responseBody),
     put: (url: string, body: object) => axios.put(url, body).then(responseBody),
     delete: (url: string) => axios.delete(url).then(responseBody),
-    post: (url: string, body: object) => axios.post(url, body).then(responseBody)
+    post: (url: string, body: object) =>
+        axios.post(url, body instanceof FormData ? body : body, {
+            headers: body instanceof FormData ? {'Content-Type': 'multipart/form-data'} : undefined
+        }).then(responseBody),
 }
 
 const Account = {
@@ -85,10 +88,17 @@ const Diary = {
     getStatisticsByPeriod: (period: string) => requests.get(`diary/getStatisticsByPeriod/${period}`),
 }
 
+const Admin = {
+    createNewProductNutrition: (value: any) => requests.post('productNutrition/create', value),
+    deleteProductNutrition: (id: number) => requests.delete(`productNutrition/${id}`),
+    updateProductNutrition: (value: any) => requests.put(`productNutrition/update`, value)
+}
+
 const api = {
     Account,
     ProductNutrition,
-    Diary
+    Diary,
+    Admin
 }
 
 export default api;
