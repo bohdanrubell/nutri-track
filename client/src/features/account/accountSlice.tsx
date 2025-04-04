@@ -25,6 +25,7 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
             localStorage.setItem('user', JSON.stringify(user));
             if (user){
                 toast.success("Успішна авторизація!")
+                router.navigate('/productNutrition')
             }
             return user;
         }catch (error: any){
