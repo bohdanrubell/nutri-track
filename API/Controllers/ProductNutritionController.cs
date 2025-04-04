@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
-using NutriTrack.DTO;
 using NutriTrack.DTO.ProductNutrition;
 using NutriTrack.Entities;
 using NutriTrack.Extensions;
@@ -17,22 +15,20 @@ namespace NutriTrack.Controllers;
 public class ProductNutritionController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly ImageService _imageService;
-    private readonly IMapper _mapper;
+    private readonly ImageService _imageService; 
 
-    public ProductNutritionController(ApplicationDbContext context, IMapper mapper, ImageService imageService)
+    public ProductNutritionController(ApplicationDbContext context, ImageService imageService)
     {
         _context = context;
-        _mapper = mapper;
         _imageService = imageService;
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductNutritionResponse>> GetProductNutrition(int id)
+    public async Task<ActionResult<ProductResponse>> GetProductNutrition(int id)
     {
         var productNutrition = await _context.ProductNutritions
             .Where(n => n.Id == id)
-            .Select(p => new ProductNutritionResponse
+            .Select(p => new ProductResponse
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -51,10 +47,10 @@ public class ProductNutritionController : ControllerBase
     }
 
     [HttpGet("categories")]
-    public async Task<ActionResult<List<ProductNutritionCategoryResponse>>> GetProductNutritionCategories()
+    public async Task<ActionResult<List<ProductCategoryResponse>>> GetProductNutritionCategories()
     {
         return await _context.ProductNutritionCategories
-            .Select(p => new ProductNutritionCategoryResponse
+            .Select(p => new ProductCategoryResponse
             {
                 Name = p.Name
             })
@@ -62,7 +58,7 @@ public class ProductNutritionController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<PagedList<ProductNutritionResponse>>> GetProducts(
+    public async Task<ActionResult<PagedList<ProductResponse>>> GetProducts(
         [FromQuery] ProductNutritionParams productNutritionParams)
     {
         var query = _context.ProductNutritions
@@ -70,7 +66,7 @@ public class ProductNutritionController : ControllerBase
             .Sort(productNutritionParams.OrderBy)
             .Search(productNutritionParams.SearchTerm)
             .FilterByCategories(productNutritionParams.ProductNutritionCategory)
-            .Select(p => new ProductNutritionResponse
+            .Select(p => new ProductResponse
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -79,12 +75,12 @@ public class ProductNutritionController : ControllerBase
                 CarbohydratesPer100Grams = p.CarbohydratesPer100Grams,
                 FatPer100Grams = p.FatPer100Grams,
                 CategoryName = p.ProductNutritionCategory.Name,
-                ImageId = p.ImageUrl
+                ImageId = p.ImageUrl!
             })
             .AsQueryable();
 
         var products =
-            await PagedList<ProductNutritionResponse>.ToPagedList(query, productNutritionParams.PageNumber,
+            await PagedList<ProductResponse>.ToPagedList(query, productNutritionParams.PageNumber,
                 productNutritionParams.PageSize);
 
         Response.AddPaginationHeader(products.MetaData);
@@ -94,10 +90,17 @@ public class ProductNutritionController : ControllerBase
     
     [Authorize(Roles = "Admin")]
     [HttpPost("create")]
-    public async Task<ActionResult<ProductNutritionResponse>> CreateProductNutrition([FromForm]CreateProductNutritionRequest request)
+    public async Task<ActionResult<ProductResponse>> CreateProductNutrition([FromForm]CreateProductRequest request)
     {
-        var newProduct = _mapper.Map<ProductNutrition>(request);
-
+        var newProduct = new ProductNutrition
+        {
+            Name = request.Name,
+            CaloriesPer100Grams = request.CaloriesPer100Grams,
+            ProteinPer100Grams = request.ProteinPer100Grams,
+            FatPer100Grams = request.FatPer100Grams,
+            CarbohydratesPer100Grams = request.CarbohydratesPer100Grams,
+        };
+        
         var category = await _context.ProductNutritionCategories
             .Where(c => c.Name == request.CategoryName)
             .SingleOrDefaultAsync();
@@ -105,21 +108,18 @@ public class ProductNutritionController : ControllerBase
         if (category is null) return NotFound("Category not found");
         
         newProduct.ProductNutritionCategory = category;
-        
-        string? imageUrl = null;
 
-        if (request.File != null)
+        if (request.File is not null)
         {
-            imageUrl = await _imageService.UploadImageAsync(request.File);
+            var imageUrl = await _imageService.UploadImageAsync(request.File);
+            newProduct.ImageUrl = imageUrl;
         }
-        
-        newProduct.ImageUrl = imageUrl;
         
         await _context.ProductNutritions.AddAsync(newProduct);
 
         var result = await _context.SaveChangesAsync() > 0;
         
-        var productResponse = new ProductNutritionResponse
+        var productResponse = new ProductResponse
         {
             Id = newProduct.Id,
             Name = newProduct.Name,
@@ -128,44 +128,49 @@ public class ProductNutritionController : ControllerBase
             CarbohydratesPer100Grams = newProduct.CarbohydratesPer100Grams,
             FatPer100Grams = newProduct.FatPer100Grams,
             CategoryName = newProduct.ProductNutritionCategory.Name,
-            ImageId = newProduct.ImageUrl
+            ImageId = newProduct.ImageUrl!
         };
         
         if (result) return Ok(productResponse);
 
-        return BadRequest("Problem creating new product");
+        return BadRequest("Виникла проблема з додаванням продукту!");
     }
     
     [Authorize(Roles = "Admin")]
     [HttpPut("update")]
-    public async Task<ActionResult> UpdateProductNutrition(UpdateProductNutritionRequest request)
+    public async Task<ActionResult> UpdateProductNutrition([FromForm]UpdateProductRequest request)
     {
         var updatedProduct = await _context.ProductNutritions
             .SingleOrDefaultAsync(p => p.Id == request.Id);
 
-        if (updatedProduct == null) return NotFound();
-
-        _mapper.Map(request, updatedProduct);
+        if (updatedProduct is null)
+            return NotFound("Продукт було не знайдено!");
+        
+        updatedProduct.Name = request.Name;
+        updatedProduct.CaloriesPer100Grams = request.CaloriesPer100Grams;
+        updatedProduct.ProteinPer100Grams = request.ProteinPer100Grams;
+        updatedProduct.FatPer100Grams = request.FatPer100Grams;
+        updatedProduct.CarbohydratesPer100Grams = request.CarbohydratesPer100Grams;
 
         var category = await _context.ProductNutritionCategories
-            .Where(c => c.Name == request.CategoryName)
-            .SingleOrDefaultAsync();
-        
-        if (category == null) return NotFound("Category not found");
-        
+            .SingleOrDefaultAsync(c => c.Name == request.CategoryName);
+
+        if (category == null)
+            return NotFound("Вказана катерогія не була знайдена");
+    
         updatedProduct.ProductNutritionCategory = category;
-        
+
         if (request.File != null)
         {
             var imageUrl = await _imageService.UploadImageAsync(request.File);
             updatedProduct.ImageUrl = imageUrl;
         }
-        
+
         var result = await _context.SaveChangesAsync() > 0;
+        if (result)
+            return NoContent();
 
-        if (result) return NoContent();
-
-        return BadRequest("Problem updating product");
+        return BadRequest("Виникла проблема зі оновленням продукту!");
     }
     
     [Authorize(Roles = "Admin")]

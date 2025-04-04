@@ -1,6 +1,6 @@
 ﻿namespace NutriTrack.DTO.ProductNutrition;
 
-public class ProductNutritionCategoryResponse
+public class ProductCategoryResponse
 {
     public string Name { get; set; }
 }

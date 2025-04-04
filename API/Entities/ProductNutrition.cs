@@ -13,6 +13,6 @@ public class ProductNutrition
     public string? ImageUrl { get; set; }
 
     public ProductNutritionCategory ProductNutritionCategory { get; set; }
-    
+
     public List<ProductRecord> ProductRecords { get; set; }
 }

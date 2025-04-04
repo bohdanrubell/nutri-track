@@ -2,7 +2,7 @@
 
 namespace NutriTrack.DTO.ProductNutrition;
 
-public class UpdateProductNutritionRequest
+public class UpdateProductRequest
 {
     public int Id { get; set; }
     [Required]
