@@ -163,6 +163,9 @@ public class ProductNutritionController : ControllerBase
         if (request.File != null)
         {
             var imageUrl = await _imageService.UploadImageAsync(request.File);
+            
+            if (!string.IsNullOrEmpty(updatedProduct.ImageUrl)) await _imageService.DeleteImageAsync(updatedProduct.ImageUrl);
+            
             updatedProduct.ImageUrl = imageUrl;
         }
 
@@ -180,6 +183,11 @@ public class ProductNutritionController : ControllerBase
         var product = await _context.ProductNutritions.FindAsync(id);
 
         if (product == null) return NotFound();
+
+        if (!string.IsNullOrEmpty(product.ImageUrl))
+        {
+            await _imageService.DeleteImageAsync(product.ImageUrl);
+        }
         
         _context.ProductNutritions.Remove(product);
 
