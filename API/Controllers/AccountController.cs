@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -153,127 +152,139 @@ public class AccountController : ControllerBase
         }
         catch (UserIsNotAuthorizedException exception)
         {
-            return Unauthorized(new { exception.Message });
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
         }
         catch (UserDoesNotExistException exception)
         {
-            return NotFound(new { exception.Message });
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
-
-    [Authorize]
+    
     [HttpPut("profile")]
     public async Task<ActionResult> UpdateUserProfile(UpdateUserProfileRequest request, TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
-
-        user.UserGender = Enum.Parse<Gender>(request.Gender);
-        user.Height = request.Height;
-
-        var goal = await GetGoalTypeByName(request.CurrentGoalType);
-
-        if (goal is null) return NotFound($"Ціль {request.CurrentGoalType} не знайдено в базі даних");
-
-        var activityLevel = await GetActivityLevelByName(request.CurrentActivityLevel);
-
-        if (activityLevel is null) return NotFound($"Ціль {request.CurrentActivityLevel} не знайдено в базі даних");
-
-        var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
-
-        var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
-
-        if (userCurrentActivityLevel.ActivityLevel.Name != request.CurrentActivityLevel)
+        try
         {
-            var newActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
-            await _context.ActivityLevelLogs.AddAsync(newActivityLevelLog, cancellationToken);
-        }
+            var user = await _userService.GetUserAsync();
 
-        if (userCurrentGoalType.Goal.Name != request.CurrentGoalType)
+            await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+            user.UserGender = Enum.Parse<Gender>(request.Gender);
+            user.Height = request.Height;
+
+            var goal = await GetGoalTypeByName(request.CurrentGoalType);
+
+            if (goal is null) return NotFound($"Ціль {request.CurrentGoalType} не знайдено в базі даних");
+
+            var activityLevel = await GetActivityLevelByName(request.CurrentActivityLevel);
+
+            if (activityLevel is null) return NotFound($"Ціль {request.CurrentActivityLevel} не знайдено в базі даних");
+
+            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+
+            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+
+            if (userCurrentActivityLevel.ActivityLevel.Name != request.CurrentActivityLevel)
+            {
+                var newActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
+                await _context.ActivityLevelLogs.AddAsync(newActivityLevelLog, cancellationToken);
+            }
+
+            if (userCurrentGoalType.Goal.Name != request.CurrentGoalType)
+            {
+                var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
+                await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await _userManager.UpdateAsync(user);
+
+            await transaction.CommitAsync(cancellationToken);
+
+            return NoContent();
+        }
+        catch (UserIsNotAuthorizedException exception)
         {
-            var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
-            await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
         }
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        await _userManager.UpdateAsync(user);
-
-        await transaction.CommitAsync(cancellationToken);
-
-        return NoContent();
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
-
-    [Authorize]
+    
     [HttpPost("addWeightRecord")]
     public async Task<ActionResult> AddNewWeightRecord(TimeProvider timeProvider, WeightRecordRequest request,
         CancellationToken cancellationToken)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        try
+        {
+            var user = await _userService.GetUserAsync();
 
-        if (userId == null) return NotFound("Користувач не авторизований.");
+            var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
+            await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
-
-        var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
-        await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return NoContent();
+            return NoContent();
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
-
-    [Authorize]
+    
     [HttpGet("currentUser")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
-
-        return new UserResponse
+        try
         {
-            Id = user.Id,
-            Username = user.UserName!,
-            Token = await _tokenService.GenerateToken(user)
-        };
+            var user = await _userService.GetUserAsync();
+
+            return new UserResponse
+            {
+                Id = user.Id,
+                Username = user.UserName!,
+                Token = await _tokenService.GenerateToken(user)
+            };
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
 
     [HttpGet("activityLevels")]
-    public async Task<ActionResult<List<ActivityLevelResponse>>> GetActivityLevels(CancellationToken ct)
+    public async Task<ActionResult<List<ActivityLevelResponse>>> GetActivityLevels()
     {
         var activityLevels = await _context.ActivityLevels
             .Select(a => new ActivityLevelResponse
             {
                 Id = a.Id,
                 Name = a.Name
-            }).ToListAsync(ct);
+            }).ToListAsync();
 
         return Ok(activityLevels);
     }
 
     [HttpGet("goalTypes")]
-    public async Task<ActionResult<List<GoalTypeResponse>>> GetGoalTypes(CancellationToken ct)
+    public async Task<ActionResult<List<GoalTypeResponse>>> GetGoalTypes()
     {
         var goalTypes = await _context.GoalTypes
             .Select(g => new GoalTypeResponse
             {
                 Id = g.Id,
                 Name = g.Name
-            }).ToListAsync(ct);
+            }).ToListAsync();
 
         return Ok(goalTypes);
     }
