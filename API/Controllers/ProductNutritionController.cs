@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
@@ -44,17 +45,6 @@ public class ProductNutritionController : ControllerBase
         if (productNutrition == null) return NotFound();
 
         return productNutrition;
-    }
-
-    [HttpGet("categories")]
-    public async Task<ActionResult<List<ProductCategoryResponse>>> GetProductNutritionCategories()
-    {
-        return await _context.ProductNutritionCategories
-            .Select(p => new ProductCategoryResponse
-            {
-                Name = p.Name
-            })
-            .ToListAsync();
     }
     
     [HttpGet]
@@ -196,6 +186,50 @@ public class ProductNutritionController : ControllerBase
         if (result) return Ok();
 
         return BadRequest("Problem deleting the product");
+    }
+    
+    [HttpGet("categories")]
+    public async Task<ActionResult<List<ProductCategoryResponse>>> GetProductNutritionCategories()
+    {
+        return await _context.ProductNutritionCategories
+            .Select(p => new ProductCategoryResponse
+            {
+                Name = p.Name
+            })
+            .ToListAsync();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("category/add")]
+    public async Task<ActionResult> AddNewProductNutritionCategory([Required]string categoryName)
+    {
+        var isCategoryExist = await _context.ProductNutritionCategories.AnyAsync(c => c.Name == categoryName);
+
+        if (isCategoryExist) return Conflict($"Категорія з назвою {categoryName} існує в базі даних!");
+
+        var newCategory = new ProductNutritionCategory
+        {
+            Name = categoryName
+        };
+        
+        await _context.ProductNutritionCategories.AddAsync(newCategory);
+        await _context.SaveChangesAsync();
+        
+        return Created();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("category/{id}")]
+    public async Task<ActionResult> DeleteProductNutritionCategory([Required] int id)
+    {
+        var category = await _context.ProductNutritionCategories.FirstOrDefaultAsync(c => c.Id == id);
+
+        if (category is null) return NotFound($"Категорія під ідентифікатором {id} не існує у базі даних! ");
+        
+        _context.ProductNutritionCategories.Remove(category);
+        await _context.SaveChangesAsync();
+        
+        return NoContent();
     }
     
 }
