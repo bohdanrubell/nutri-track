@@ -55,7 +55,7 @@ export default function Header() {
                         <StorageIcon/>
                         База продуктів
                     </ListItem>
-                    {user  &&
+                    {user && user!.roles!.includes('User') &&
                         <>
                             <ListItem
                                 component={NavLink}

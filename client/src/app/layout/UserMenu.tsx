@@ -44,9 +44,10 @@ export default function UserMenu() {
                 open={open}
                 onClose={handleClose}
             >
-                <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                {user!.roles!.includes('User') && <MenuItem component={Link} to="/profile" onClick={handleClose}>
                     Профіль користувача
-                </MenuItem>
+                </MenuItem>}
+
                 <MenuItem onClick={handleLogout}>Вийти з аккаунту</MenuItem>
             </Menu>
         </>

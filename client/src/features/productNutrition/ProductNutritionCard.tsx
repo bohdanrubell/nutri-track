@@ -12,14 +12,14 @@ import {useState} from "react";
 import TextField from "@mui/material/TextField";
 import api from "../../app/api/api.ts";
 import {toast} from "react-toastify";
+import {useAppSelector} from "../../app/store/store.ts";
 
 interface Properties {
     product: ProductNutrition;
 }
 
-
-
 export default function ProductNutritionCard({ product }: Properties) {
+    const { user } = useAppSelector((state) => state.account);
     const [open, setOpen] = useState(false);
     const [grams, setGrams] = useState(100);
     const [loading, setLoading] = useState(false);
@@ -53,7 +53,9 @@ export default function ProductNutritionCard({ product }: Properties) {
 
             <CardMedia
                 component="img"
-                image="/images/TEST_PICTURE.jpg"
+                image={product.imageId
+                    ? product.imageId
+                    : "/images/TEST_PICTURE.jpg"}
                 alt={product.name}
                 sx={{
                     height: 100,
@@ -65,7 +67,7 @@ export default function ProductNutritionCard({ product }: Properties) {
 
             <CardContent sx={{ p: 1 }}>
                 <Typography variant="caption" color="text.secondary">
-                    {product.calories} ккал · Б: {product.protein}г · Ж: {product.fat}г · В: {product.carbohydrates}г
+                    {product.caloriesPer100Grams} ккал · Б: {product.proteinPer100Grams}г · Ж: {product.fatPer100Grams}г · В: {product.carbohydratesPer100Grams}г
                 </Typography>
             </CardContent>
 
@@ -78,9 +80,11 @@ export default function ProductNutritionCard({ product }: Properties) {
                     color="primary"
                     fullWidth
                 >
-                    Детальніше
+                    {user?.roles?.includes('User')
+                        ? "Детальніше"
+                        : "Налаштування"}
                 </Button>
-                <Button
+                {user!.roles!.includes('User') && <Button
                     size="small"
                     variant="contained"
                     color="primary"
@@ -88,7 +92,7 @@ export default function ProductNutritionCard({ product }: Properties) {
                     onClick={() => setOpen(true)}
                 >
                     Додати
-                </Button>
+                </Button>}
             </CardActions>
         </Card>
 
