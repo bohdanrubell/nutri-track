@@ -1,10 +1,11 @@
 export interface ProductNutrition {
     id: number,
     name: string,
-    calories: number,
-    protein: number,
-    fat: number,
-    carbohydrates: number
+    caloriesPer100Grams: number,
+    proteinPer100Grams: number,
+    fatPer100Grams: number,
+    carbohydratesPer100Grams: number,
+    imageId?: string
 }
 
 export interface ProductNutritionParams {
