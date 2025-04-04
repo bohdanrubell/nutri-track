@@ -113,6 +113,10 @@ export const productNutritionSlice = createSlice({
         setProduct: (state, action) => {
             adapter.upsertOne(state, action.payload);
             state.productsLoaded = false;
+        },
+        removeProduct: (state, action) => {
+            adapter.removeOne(state, action.payload);
+            state.productsLoaded = false;
         }
     },
     extraReducers: (builder => {
@@ -148,6 +152,7 @@ export const productNutritionSlice = createSlice({
 export const {
     setProductParams,
     resetProductParams,
+    removeProduct,
     setMetaData,
     setPageNumber,
     setProduct
