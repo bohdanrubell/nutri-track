@@ -21,73 +21,71 @@ public class DiaryController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly TimeProvider _timeProvider;
-    private readonly UserManager<User> _userManager;
     private readonly UserService _userService;
 
     public DiaryController(ApplicationDbContext context, UserManager<User> userManager, TimeProvider timeProvider,
         UserService userService)
     {
         _context = context;
-        _userManager = userManager;
         _timeProvider = timeProvider;
         _userService = userService;
     }
-
-    [Authorize]
+    
     [HttpGet("getRecordByDate/{date}")]
     public async Task<ActionResult<DairyRecordResponse>> GetRecordByDate(DateTime date)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
-
-        var record = await _context.Records
-            .Include(r => r.ProductRecords)
-            .ThenInclude(pr => pr.ProductNutrition)
-            .FirstOrDefaultAsync(r => r.Diary.User.Id == user.Id && r.Date.Date == date.Date);
-
-        if (record is null)
-            return NotFound();
-
-        var recordResponse = new DairyRecordResponse
+        try
         {
-            DailyNutritions = new DailyNutritionsResponse
-            {
-                DailyCalories = record.DailyCalories,
-                DailyProtein = record.DailyProtein,
-                DailyFat = record.DailyFat,
-                DailyCarbohydrates = record.DailyCarbohydrates
-            },
-            ProductRecords = record.ProductRecords.Select(pr => new ProductRecordResponse
-            {
-                Id = pr.Id,
-                Name = pr.ProductNutrition.Name,
-                Grams = Math.Round(pr.Grams, 2),
-                Calories = (int)Math.Round(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
-                Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100, 2),
-                Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100, 2),
-                Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100, 2)
-            }).ToList()
-        };
+            var user = await _userService.GetUserAsync();
 
-        return Ok(recordResponse);
+            var record = await _context.Records
+                .Include(r => r.ProductRecords)
+                .ThenInclude(pr => pr.ProductNutrition)
+                .FirstOrDefaultAsync(r => r.Diary.User.Id == user.Id && r.Date.Date == date.Date);
+
+            if (record is null)
+                return NotFound();
+
+            var recordResponse = new DairyRecordResponse
+            {
+                DailyNutritions = new DailyNutritionsResponse
+                {
+                    DailyCalories = record.DailyCalories,
+                    DailyProtein = record.DailyProtein,
+                    DailyFat = record.DailyFat,
+                    DailyCarbohydrates = record.DailyCarbohydrates
+                },
+                ProductRecords = record.ProductRecords.Select(pr => new ProductRecordResponse
+                {
+                    Id = pr.Id,
+                    Name = pr.ProductNutrition.Name,
+                    Grams = Math.Round(pr.Grams, 2),
+                    Calories = (int)Math.Round(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
+                    Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100, 2),
+                    Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100, 2),
+                    Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100, 2)
+                }).ToList()
+            };
+
+            return Ok(recordResponse);
+
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
-
-    [Authorize]
+    
     [HttpPost("addNewProductRecord")]
     public async Task<ActionResult> AddProductToRecord(ProductRecordRequest productRecordRequest)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
+        try
+        {
+            var user = await _userService.GetUserAsync();
 
         var currentDate = DateTime.UtcNow.Date;
 
@@ -138,19 +136,24 @@ public class DiaryController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(newProductRecord.Id);
+        
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
-
-    [Authorize]
+    
     [HttpPut("updateProductRecord")]
     public async Task<ActionResult> UpdateProductRecord([FromBody] ProductRecordUpdateRequest productRecordRequest)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userId == null) return NotFound("Користувач не авторизований.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) return NotFound("Користувача не знайдено.");
+        try
+        {
+            var user = await _userService.GetUserAsync();
 
         var product = await _context.ProductRecords
             .Include(p => p.Record)
@@ -165,6 +168,16 @@ public class DiaryController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+        
+        }
+        catch (UserIsNotAuthorizedException exception)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
+        }
+        catch (UserDoesNotExistException exception)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
+        }
     }
 
     [HttpDelete("deleteProductRecord/{id}")]
@@ -188,15 +201,14 @@ public class DiaryController : ControllerBase
         }
         catch (UserIsNotAuthorizedException exception)
         {
-            return Unauthorized(new { exception.Message });
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
         }
         catch (UserDoesNotExistException exception)
         {
-            return NotFound(new { exception.Message });
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
-
-    [Authorize]
+    
     [HttpGet("getStatisticsByPeriod/{period}")]
     public async Task<ActionResult<List<PeriodStatisticsResponse>>> GetStatisticsByPeriodAsync(string period)
     {
@@ -277,11 +289,11 @@ public class DiaryController : ControllerBase
         }
         catch (UserIsNotAuthorizedException exception)
         {
-            return Unauthorized(new { exception.Message });
+            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
         }
         catch (UserDoesNotExistException exception)
         {
-            return NotFound(new { exception.Message });
+            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
 
