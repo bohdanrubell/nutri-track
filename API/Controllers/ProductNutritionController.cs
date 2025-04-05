@@ -78,6 +78,31 @@ public class ProductNutritionController : ControllerBase
         return products;
     }
     
+    [HttpGet("all")]
+    public async Task<ActionResult<List<ProductResponse>>> GetAllProductsAsync()
+    {
+        var products = await _context.ProductNutritions
+            .Include(p => p.ProductNutritionCategory)
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+
+        var productsDto = products.Select(product => new ProductResponse
+        {
+            Id = product.Id,
+            Name = product.Name,
+            CaloriesPer100Grams = product.CaloriesPer100Grams,
+            ProteinPer100Grams = product.ProteinPer100Grams,
+            FatPer100Grams = product.FatPer100Grams,
+            CarbohydratesPer100Grams = product.CarbohydratesPer100Grams,
+            ImageId = product.ImageUrl!,
+            CategoryName = product.ProductNutritionCategory.Name,
+        }).ToList();
+
+        return Ok(productsDto);
+    }
+
+    
+    
     [Authorize(Roles = "Admin")]
     [HttpPost("create")]
     public async Task<ActionResult<ProductResponse>> CreateProductNutrition([FromForm]CreateProductRequest request)

@@ -4,4 +4,6 @@ public class ProductRecordRequest
 {
     public int ProductNutritionId { get; set; }
     public double ConsumedGrams { get; set; }
+
+    public DateTime? Date { get; set; }
 }

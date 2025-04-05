@@ -21,12 +21,12 @@ public class Record
     public List<ProductRecord> ProductRecords { get; set; }
 
 
-    public static Record Create(TimeProvider timeProvider, int dailyCalories, double dailyProtein, double dailyFat,
+    public static Record Create(DateTime date, int dailyCalories, double dailyProtein, double dailyFat,
         double dailyCarbohydrates, Diary diary, ActivityLevelLog activityLog, GoalTypeLog goalLog)
     {
         var record = new Record
         {
-            Date = timeProvider.GetUtcNow().Date,
+            Date = date,
             DailyCalories = dailyCalories,
             DailyProtein = Math.Round(dailyProtein, 2),
             DailyFat = Math.Round(dailyFat,2),

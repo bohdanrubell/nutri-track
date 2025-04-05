@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Data;
 using NutriTrack.DTO;
@@ -20,17 +17,15 @@ namespace NutriTrack.Controllers;
 public class DiaryController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly TimeProvider _timeProvider;
     private readonly UserService _userService;
 
-    public DiaryController(ApplicationDbContext context, UserManager<User> userManager, TimeProvider timeProvider,
+    public DiaryController(ApplicationDbContext context,
         UserService userService)
     {
         _context = context;
-        _timeProvider = timeProvider;
         _userService = userService;
     }
-    
+
     [HttpGet("getRecordByDate/{date}")]
     public async Task<ActionResult<DairyRecordResponse>> GetRecordByDate(DateTime date)
     {
@@ -68,7 +63,6 @@ public class DiaryController : ControllerBase
             };
 
             return Ok(recordResponse);
-
         }
         catch (UserIsNotAuthorizedException exception)
         {
@@ -79,7 +73,7 @@ public class DiaryController : ControllerBase
             return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
-    
+
     [HttpPost("addNewProductRecord")]
     public async Task<ActionResult> AddProductToRecord(ProductRecordRequest productRecordRequest)
     {
@@ -87,56 +81,56 @@ public class DiaryController : ControllerBase
         {
             var user = await _userService.GetUserAsync();
 
-        var currentDate = DateTime.UtcNow.Date;
+            var currentDate = productRecordRequest.Date?.Date ?? DateTime.UtcNow.Date;
 
-        var diary = await _context.Diaries
-            .Include(d => d.Records)
-            .FirstAsync(d => d.UserId == user.Id);
+            var diary = await _context.Diaries
+                .Include(d => d.Records)
+                .FirstAsync(d => d.UserId == user.Id);
 
-        var record = diary.Records.FirstOrDefault(r => r.Date == currentDate);
-        if (record is null)
-        {
-            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+            var record = diary.Records.FirstOrDefault(r => r.Date == currentDate);
+            if (record is null)
+            {
+                var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
 
-            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+                var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
 
-            var userWeightRecord = await _context.WeightRecords
-                .Include(w => w.User)
-                .Where(w => w.User.Id == user.Id)
-                .OrderByDescending(w => w.DateOfRecordCreated)
-                .Select(w => new WeightRecordResponse
-                {
-                    Weight = w.Weight
-                })
-                .FirstAsync();
+                var userWeightRecord = await _context.WeightRecords
+                    .Include(w => w.User)
+                    .Where(w => w.User.Id == user.Id)
+                    .OrderByDescending(w => w.DateOfRecordCreated)
+                    .Select(w => new WeightRecordResponse
+                    {
+                        Weight = w.Weight
+                    })
+                    .FirstAsync();
 
-            var age = DateTime.Now.Year - user.DateOfBirth.Year;
+                var age = DateTime.Now.Year - user.DateOfBirth.Year;
 
-            if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
+                if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
 
-            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, userWeightRecord.Weight,
-                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, userWeightRecord.Weight,
+                    userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
 
-            record = Record.Create(_timeProvider,
-                calculator.CalculateDailyCalories(), calculator.CalculateDailyProtein(), calculator.CalculateDailyFat()
-                , calculator.CalculateDailyCarbohydrates(), diary, userCurrentActivityLevel, userCurrentGoalType);
+                record = Record.Create(currentDate,
+                    calculator.CalculateDailyCalories(), calculator.CalculateDailyProtein(),
+                    calculator.CalculateDailyFat()
+                    , calculator.CalculateDailyCarbohydrates(), diary, userCurrentActivityLevel, userCurrentGoalType);
 
-            await _context.Records.AddAsync(record);
-        }
+                await _context.Records.AddAsync(record);
+            }
 
-        var productNutrition = await _context.ProductNutritions
-            .FirstOrDefaultAsync(p => p.Id == productRecordRequest.ProductNutritionId);
+            var productNutrition = await _context.ProductNutritions
+                .FirstOrDefaultAsync(p => p.Id == productRecordRequest.ProductNutritionId);
 
-        if (productNutrition is null) return NotFound("Продукт не знайдено");
+            if (productNutrition is null) return NotFound("Продукт не знайдено");
 
-        var newProductRecord = ProductRecord.Create(record, productNutrition, productRecordRequest.ConsumedGrams);
+            var newProductRecord = ProductRecord.Create(record, productNutrition, productRecordRequest.ConsumedGrams);
 
-        await _context.ProductRecords.AddAsync(newProductRecord);
+            await _context.ProductRecords.AddAsync(newProductRecord);
 
-        await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-        return Ok(newProductRecord.Id);
-        
+            return Ok(newProductRecord.Id);
         }
         catch (UserIsNotAuthorizedException exception)
         {
@@ -147,7 +141,7 @@ public class DiaryController : ControllerBase
             return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
-    
+
     [HttpPut("updateProductRecord")]
     public async Task<ActionResult> UpdateProductRecord([FromBody] ProductRecordUpdateRequest productRecordRequest)
     {
@@ -155,20 +149,19 @@ public class DiaryController : ControllerBase
         {
             var user = await _userService.GetUserAsync();
 
-        var product = await _context.ProductRecords
-            .Include(p => p.Record)
-            .ThenInclude(p => p.Diary)
-            .FirstOrDefaultAsync(p =>
-                p.Id == productRecordRequest.ProductRecordId && p.Record.Diary.User.Id == user.Id);
+            var product = await _context.ProductRecords
+                .Include(p => p.Record)
+                .ThenInclude(p => p.Diary)
+                .FirstOrDefaultAsync(p =>
+                    p.Id == productRecordRequest.ProductRecordId && p.Record.Diary.User.Id == user.Id);
 
-        if (product is null) return NotFound("Продукт не знайдено");
+            if (product is null) return NotFound("Продукт не знайдено");
 
-        product.Grams = Math.Round(productRecordRequest.ConsumedGrams, 2);
+            product.Grams = Math.Round(productRecordRequest.ConsumedGrams, 2);
 
-        await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-        return NoContent();
-        
+            return NoContent();
         }
         catch (UserIsNotAuthorizedException exception)
         {
@@ -208,7 +201,7 @@ public class DiaryController : ControllerBase
             return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
     }
-    
+
     [HttpGet("getStatisticsByPeriod/{period}")]
     public async Task<ActionResult<List<PeriodStatisticsResponse>>> GetStatisticsByPeriodAsync(string period)
     {
@@ -277,7 +270,7 @@ public class DiaryController : ControllerBase
                         Date = g.Key.ToString("yyyy-MM-dd"),
                         ConsumedCalories = calories,
                         ConsumedProteins = Math.Round(proteins, 2),
-                        ConsumedFats = Math.Round(fats,2),
+                        ConsumedFats = Math.Round(fats, 2),
                         ConsumedCarbohydrates = Math.Round(carbs, 2),
                         Status = status.ToString()
                     };
