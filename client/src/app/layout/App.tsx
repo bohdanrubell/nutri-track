@@ -1,15 +1,17 @@
 import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Header from './Header';
 import {useCallback, useEffect, useState} from 'react';
-import { Outlet } from 'react-router-dom';
+import {Outlet, useLocation} from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import LoadingComponent from './LoadingComponent';
+import LoadingComponent from '../components/LoadingComponent.tsx';
 import { useAppDispatch } from '../store/store.ts';
 import {fetchCurrentUser} from "../../features/account/accountSlice.tsx";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import HomePage from "../../features/home/HomePage.tsx";
 
 function App() {
+    const locate = useLocation();
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(true);
 
@@ -42,7 +44,7 @@ function App() {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Header/>
+            {locate.pathname != '/' ? <Header /> : <HomePage />}
             <Container>
                 <Outlet />
             </Container>
