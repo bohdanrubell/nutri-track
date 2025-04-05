@@ -1,7 +1,7 @@
 import {
     Button,
     Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider,
+    Divider, Stack,
     Table,
     TableBody,
     TableCell,
@@ -47,7 +47,7 @@ export default function ProductNutritionDetails() {
         setUpdateMode(false);
     }
 
-    const handleSubmit = async () => {
+    const handleDelete = async () => {
         setLoading(true);
         try {
             await api.Admin.deleteProductNutrition(productNutrition.id);
@@ -67,64 +67,80 @@ export default function ProductNutritionDetails() {
 
     return (
         <>
-        <Grid container spacing={6}>
-            <Grid size={{xs: 6}}>
-                <img src={productNutrition.imageId
-                    ? productNutrition.imageId
-                    : "/images/TEST_PICTURE.jpg"} alt={productNutrition.name} style={{width: '80%'}}/>
-            </Grid>
-            <Grid size={{xs: 6}}>
-                <Typography variant='h3'>{productNutrition.name}</Typography>
-                <Divider sx={{mb: 2}}/>
-                <TableContainer>
-                    <Table>
-                        <TableBody sx={{fontSize: '1.1em'}}>
-                            <TableRow>
-                                <TableCell>Назва продукту</TableCell>
-                                <TableCell>{productNutrition.name}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Калорійність на 100 грам: </TableCell>
-                                <TableCell>{productNutrition.caloriesPer100Grams}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Поживні речовини (БЖУ): </TableCell>
-                                <TableCell>{productNutrition.proteinPer100Grams}</TableCell>
-                                <TableCell>{productNutrition.fatPer100Grams}</TableCell>
-                                <TableCell>{productNutrition.carbohydratesPer100Grams}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <Divider sx={{mb: 2}}/>
-                <Button variant='contained' onClick={() => navigate('/productNutrition')}>Назад до бази продуктів</Button>
-                {user?.roles?.includes('Admin') && (
-                    <>
-                        <Button
-                            onClick={() => handleSelectProduct(productNutrition)}
-                            startIcon={<Edit />}
-                        >
-                            Редагувати
-                        </Button>
+            <Grid container spacing={6}>
+                <Grid size={{xs:12, md:6}} display="flex" justifyContent="center" alignItems="center">
+                    <img
+                        src={productNutrition.imageId || "/images/TEST_PICTURE.jpg"}
+                        alt={productNutrition.name}
+                        style={{ width: '80%', maxHeight: 400, objectFit: 'contain' }}
+                    />
+                </Grid>
+                <Grid size={{xs:12, md:6}}>
+                    <Typography variant="h4" fontWeight={600} gutterBottom>
+                        {productNutrition.name}
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <TableContainer>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 500 }}>Калорійність (100 г)</TableCell>
+                                    <TableCell>{productNutrition.caloriesPer100Grams} ккал</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 500 }}>Білки (Б)</TableCell>
+                                    <TableCell>{productNutrition.proteinPer100Grams} г</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 500 }}>Жири (Ж)</TableCell>
+                                    <TableCell>{productNutrition.fatPer100Grams} г</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 500 }}>Вуглеводи (В)</TableCell>
+                                    <TableCell>{productNutrition.carbohydratesPer100Grams} г</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
 
-                        <Button
-                            variant='contained'
-                            color='error'
-                            onClick={() => setDeleteMode(true)}
-                        >
-                            Видалити продукт
-                        </Button>
-                    </>
-                )}
+                    <Divider sx={{ my: 2 }} />
 
+                    <Stack direction="row" spacing={2} flexWrap="wrap">
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate('/productNutrition')}
+                        >
+                            Назад до бази
+                        </Button>
+                        {user?.roles?.includes('Admin') && (
+                            <>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    startIcon={<Edit />}
+                                    onClick={() => handleSelectProduct(productNutrition)}
+                                >
+                                    Редагувати
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => setDeleteMode(true)}
+                                >
+                                    Видалити
+                                </Button>
+                            </>
+                        )}
+                    </Stack>
+                </Grid>
             </Grid>
-        </Grid>
 
             <Dialog open={deleteMode} onClose={() => setDeleteMode(false)}>
-                <DialogTitle>Видалення</DialogTitle>
+                <DialogTitle>Видалення продукту</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Ви впевнені, що хочете видалити продукт {productNutrition.name} із бази даних?
+                        Ви впевнені, що хочете видалити <strong>{productNutrition.name}</strong> із бази даних?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
@@ -133,13 +149,14 @@ export default function ProductNutritionDetails() {
                     </Button>
                     <Button
                         variant="contained"
-                        onClick={handleSubmit}
+                        color="error"
+                        onClick={handleDelete}
                         disabled={loading}
                     >
-                        {loading ? 'Видаляється...' : 'Видалити'}
+                        {loading ? 'Видалення...' : 'Видалити'}
                     </Button>
                 </DialogActions>
             </Dialog>
         </>
-    )
+    );
 }
