@@ -117,6 +117,18 @@ export default function ProductNutritionCard({ product }: Properties) {
                         value={grams}
                         onChange={(e) => setGrams(Number(e.target.value))}
                     />
+
+                    <div style={{ marginTop: '16px' }}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                            Попередні розрахунки:
+                        </Typography>
+                        <Typography variant="body2">
+                            {((product.caloriesPer100Grams * grams) / 100).toFixed(0)} ккал ·
+                            Б: {((product.proteinPer100Grams * grams) / 100).toFixed(1)}г ·
+                            Ж: {((product.fatPer100Grams * grams) / 100).toFixed(1)}г ·
+                            В: {((product.carbohydratesPer100Grams * grams) / 100).toFixed(1)}г
+                        </Typography>
+                    </div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} disabled={loading}>
@@ -131,6 +143,7 @@ export default function ProductNutritionCard({ product }: Properties) {
                     </Button>
                 </DialogActions>
             </Dialog>
+
         </>
     );
 }
