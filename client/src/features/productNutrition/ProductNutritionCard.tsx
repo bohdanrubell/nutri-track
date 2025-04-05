@@ -3,7 +3,7 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardMedia, Dialog, DialogActions, DialogContent, DialogTitle,
+    CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip,
     Typography
 } from "@mui/material";
 import { Link } from 'react-router-dom';
@@ -43,13 +43,22 @@ export default function ProductNutritionCard({ product }: Properties) {
     return (
         <>
         <Card sx={{ maxWidth: 250, p: 1, textAlign: 'center' }}>
-            <Typography
-                variant="subtitle1"
-                fontWeight={600}
-                sx={{ mb: 1 }}
-            >
-                {product.name}
-            </Typography>
+            <Tooltip title={product.name}>
+                <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    sx={{
+                        mb: 1,
+                        height: 32,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                    }}
+                >
+                    {product.name}
+                </Typography>
+            </Tooltip>
 
             <CardMedia
                 component="img"
