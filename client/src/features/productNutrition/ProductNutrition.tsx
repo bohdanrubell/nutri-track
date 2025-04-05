@@ -13,6 +13,8 @@ import {setPageNumber, setProductParams} from "./productNutritionSlice.ts";
 import AddIcon from '@mui/icons-material/Add';
 import {useState} from "react";
 import ProductNutritionForm from "./ProductNutritionForm.tsx";
+import SimpleBar from "simplebar-react";
+import 'simplebar-react/dist/simplebar.min.css';
 
 const sortOptions = [
     { value: 'name', label: 'Від А до Я' },
@@ -51,12 +53,14 @@ export default function ProductNutrition() {
                         onChange={(e) => dispatch(setProductParams({ orderBy: e.target.value }))}
                     />
                 </Paper>
-                <Paper sx={{ p: 2 }}>
-                    <CheckboxButton
-                        items={categories}
-                        checked={productParams.categories}
-                        onChange={(items: ProductNutritionCategory[]) => dispatch(setProductParams({ categories: items }))}
-                    />
+                <Paper sx={{ p: 2, maxHeight: 300, overflow: 'hidden' }}>
+                    <SimpleBar style={{ maxHeight: 200 }}>
+                        <CheckboxButton
+                            items={categories}
+                            checked={productParams.categories}
+                            onChange={(items: ProductNutritionCategory[]) => dispatch(setProductParams({ categories: items }))}
+                        />
+                    </SimpleBar>
                 </Paper>
             </Grid>
             <Grid size={{xs: 9}}>
