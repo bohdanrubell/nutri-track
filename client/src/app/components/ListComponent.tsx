@@ -1,12 +1,12 @@
 import {FormControl, FormHelperText, InputLabel, MenuItem, Select} from "@mui/material";
 import {useController, UseControllerProps} from "react-hook-form";
 
-interface Props extends UseControllerProps{
+interface Properties extends UseControllerProps{
     label: string;
     items: string[];
 }
 
-export default function AppSelectList(props: Props) {
+export default function ListComponent(props: Properties) {
     const {fieldState, field} = useController({...props, defaultValue: ''});
     return (
         <FormControl fullWidth error={!!fieldState.error}>

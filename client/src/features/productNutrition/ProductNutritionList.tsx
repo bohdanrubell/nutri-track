@@ -2,7 +2,7 @@ import Grid from "@mui/material/Grid2";
 import { useAppSelector } from '../../app/store/store.ts';
 import ProductNutritionCard from "./ProductNutritionCard.tsx";
 import {ProductNutrition} from "../../app/models/productNutrition.ts";
-import LoadingComponent from "../../app/layout/LoadingComponent.tsx";
+import LoadingComponent from "../../app/components/LoadingComponent.tsx";
 
 interface ListProperties {
     products: ProductNutrition[];

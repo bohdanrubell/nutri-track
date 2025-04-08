@@ -6,11 +6,11 @@ interface PaginationProperties {
     onPageChange: (page: number) => void;
 }
 
-export default function AppPagination({ metaData, onPageChange }: PaginationProperties) {
+export default function PaginationComponent({ metaData, onPageChange }: PaginationProperties) {
     const {currentPage, totalPages } = metaData;
 
     return (
-        <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ marginBottom: 3 }}>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
             {totalPages > 1 && (
                 <Pagination
                     color='secondary'

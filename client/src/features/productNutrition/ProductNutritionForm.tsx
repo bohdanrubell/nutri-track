@@ -1,15 +1,15 @@
-import { Typography, Grid, Paper, Box, Button } from "@mui/material";
+import { Typography, Paper, Box, Button } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import {FieldValues, useForm} from "react-hook-form";
-import AppTextInput from "../../app/components/AppTextInput";
+import InputComponent from "../../app/components/InputComponent.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useAppDispatch} from "../../app/store/store.ts";
 import {fetchProductAsync, setProduct} from "./productNutritionSlice.ts";
 import {LoadingButton} from "@mui/lab";
 import {ProductNutrition} from "../../app/models/productNutrition.ts";
 import {validationSchema} from "./productNutritionValidation.ts";
-import useProductsNutrition from "../../app/hooks/useProductsNutrition.tsx";
-import AppSelectList from "../../app/components/AppSelectList.tsx";
-import api from "../../app/api/api.ts";
+import useProductsNutrition from "./useProductsNutrition.tsx";
+import ListComponent from "../../app/components/ListComponent.tsx";
 import apiClient from "../../app/axios/apiClient.ts";
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
@@ -125,23 +125,23 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
 
             <form onSubmit={handleSubmit(handleSubmitData)}>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                        <AppTextInput control={control} name='name' label='Назва продукту'/>
+                    <Grid size={{xs: 12, sm:6}}>
+                        <InputComponent control={control} name='name' label='Назва продукту'/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <AppTextInput control={control} name='caloriesPer100Grams' label='Калорійність на 100г'/>
+                    <Grid size={{xs: 12, sm:6}}>
+                        <InputComponent control={control} name='caloriesPer100Grams' label='Калорійність на 100г'/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <AppTextInput control={control} name='proteinPer100Grams' label='Білки'/>
+                    <Grid size={{xs: 12, sm:6}}>
+                        <InputComponent control={control} name='proteinPer100Grams' label='Білки'/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <AppTextInput control={control} name='fatPer100Grams' label='Жири'/>
+                    <Grid size={{xs: 12, sm:6}}>
+                        <InputComponent control={control} name='fatPer100Grams' label='Жири'/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <AppTextInput control={control} name='carbohydratesPer100Grams' label='Вуглеводи'/>
+                    <Grid size={{xs: 12, sm:6}}>
+                        <InputComponent control={control} name='carbohydratesPer100Grams' label='Вуглеводи'/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <AppSelectList control={control} items={categories.map(c => c.name)} name='categoryName'
+                    <Grid size={{xs: 12, sm:6}}>
+                        <ListComponent control={control} items={categories.map(c => c.name)} name='categoryName'
                                        label='Категорія'/>
                     </Grid>
                 </Grid>

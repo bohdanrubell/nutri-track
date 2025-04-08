@@ -1,20 +1,21 @@
 import ProductNutritionList from './ProductNutritionList.tsx';
-import LoadingComponent from '../../app/layout/LoadingComponent';
+import LoadingComponent from '../../app/components/LoadingComponent.tsx';
 import { useAppDispatch, useAppSelector } from '../../app/store/store.ts';
-import {Fab, Paper} from '@mui/material';
+import { Paper, SpeedDial, SpeedDialAction, SpeedDialIcon} from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ProductNutritionSearch from './ProductNutritionSearch.tsx';
-import RadioButtonGroup from '../../app/components/RadioButtonGroup';
-import AppPagination from '../../app/components/AppPagination';
-import useProductsNutrition from "../../app/hooks/useProductsNutrition.tsx";
-import CheckboxButton from "../../app/components/CheckboxButton.tsx";
+import RadioButtonGroupComponent from '../../app/components/RadioButtonGroupComponent.tsx';
+import PaginationComponent from '../../app/components/PaginationComponent.tsx';
+import useProductsNutrition from "./useProductsNutrition.tsx";
+import CheckboxComponent from "../../app/components/CheckboxComponent.tsx";
 import {ProductNutritionCategory} from "../../app/models/productNutrition.ts";
 import {setPageNumber, setProductParams} from "./productNutritionSlice.ts";
 import AddIcon from '@mui/icons-material/Add';
 import {useState} from "react";
 import ProductNutritionForm from "./ProductNutritionForm.tsx";
-import SimpleBar from "simplebar-react";
 import 'simplebar-react/dist/simplebar.min.css';
+import CategoryIcon from '@mui/icons-material/Category';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const sortOptions = [
     { value: 'name', label: 'Від А до Я' },
@@ -47,20 +48,18 @@ export default function ProductNutrition() {
                     <ProductNutritionSearch />
                 </Paper>
                 <Paper sx={{ p: 2, mb: 2 }}>
-                    <RadioButtonGroup
+                    <RadioButtonGroupComponent
                         selectedValue={productParams.orderBy}
                         options={sortOptions}
                         onChange={(e) => dispatch(setProductParams({ orderBy: e.target.value }))}
                     />
                 </Paper>
-                <Paper sx={{ p: 2, maxHeight: 300, overflow: 'hidden' }}>
-                    <SimpleBar style={{ maxHeight: 200 }}>
-                        <CheckboxButton
-                            items={categories}
-                            checked={productParams.categories}
-                            onChange={(items: ProductNutritionCategory[]) => dispatch(setProductParams({ categories: items }))}
-                        />
-                    </SimpleBar>
+                <Paper sx={{ p: 2, maxHeight: 400, overflow: 'hidden' }}>
+                    <CheckboxComponent
+                        availableItems={categories}
+                        selectedItems={productParams.categories}
+                        onChangeSelection={(items: ProductNutritionCategory[]) => dispatch(setProductParams({ categories: items }))}
+                    />
                 </Paper>
             </Grid>
             <Grid size={{xs: 9}}>
@@ -69,25 +68,30 @@ export default function ProductNutrition() {
             <Grid size={{xs: 3}}/>
             <Grid>
                 {metaData &&
-                    <AppPagination
+                    <PaginationComponent
                         metaData={metaData}
                         onPageChange={(page: number) => dispatch(setPageNumber({pageNumber: page}))}
                     />}
             </Grid>
-            {user!.roles!.includes('Admin') && (
-                <Fab
-                    color="success"
-                    aria-label="add"
-                    sx={{
-                        position: 'fixed',
-                        bottom: 32,
-                        right: 32
-                    }}
-                    onClick={() => {setCreateMode(true)}}
+            {user?.roles?.includes('Admin') && (
+                <SpeedDial
+                    ariaLabel="Опції додавання"
+                    sx={{ position: 'fixed', bottom: 32, right: 32 }}
+                    icon={<SpeedDialIcon openIcon={<MenuIcon />} />}
                 >
-                    <AddIcon />
-                </Fab>
+                    <SpeedDialAction
+                        icon={<AddIcon />}
+                        tooltipTitle="Додати продукт"
+                        onClick={() => setCreateMode(true)}
+                    />
+                    <SpeedDialAction
+                        icon={<CategoryIcon />}
+                        tooltipTitle="Керування категоріями"
+                        onClick={() => console.log("Керування категоріями")}
+                    />
+                </SpeedDial>
             )}
+
         </Grid>
         </>
     )

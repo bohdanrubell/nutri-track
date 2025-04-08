@@ -6,7 +6,7 @@ interface RadioButtonProperties {
     selectedValue: string;
 }
 
-export default function RadioButtonGroup({ options, onChange, selectedValue }: RadioButtonProperties) {
+export default function RadioButtonGroupComponent({ options, onChange, selectedValue }: RadioButtonProperties) {
     return (
         <FormControl component="fieldset">
             <RadioGroup onChange={onChange} value={selectedValue}>
