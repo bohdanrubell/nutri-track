@@ -23,4 +23,5 @@ export interface ProductNutritionCategory{
 export default interface ProductRecordNew{
     productNutritionId: number;
     consumedGrams: number;
+    date?: string
 }
