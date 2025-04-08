@@ -78,6 +78,7 @@ const ProductNutrition = {
     list: (params: URLSearchParams) => requests.get('productNutrition', params),
     getProductById: (id: number) => requests.get(`productNutrition/${id}`),
     fetchCategories: () => requests.get('productNutrition/categories'),
+    listAll: () => requests.get('productNutrition/all'),
 }
 
 const Diary = {
@@ -94,11 +95,11 @@ const Admin = {
     updateProductNutrition: (value: any) => requests.put(`productNutrition/update`, value)
 }
 
-const api = {
+const apiClient = {
     Account,
     ProductNutrition,
     Diary,
     Admin
 }
 
-export default api;
+export default apiClient;

@@ -16,6 +16,7 @@ import {useEffect, useState} from "react";
 import {fetchProductAsync, productNutritionSelectors, removeProduct} from "./productNutritionSlice.ts";
 import LoadingComponent from "../../app/layout/LoadingComponent.tsx";
 import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {toast} from "react-toastify";
 import {ProductNutrition} from "../../app/models/productNutrition.ts";
 import ProductNutritionForm from "./ProductNutritionForm.tsx";
@@ -50,7 +51,7 @@ export default function ProductNutritionDetails() {
     const handleDelete = async () => {
         setLoading(true);
         try {
-            await api.Admin.deleteProductNutrition(productNutrition.id);
+            await apiClient.Admin.deleteProductNutrition(productNutrition.id);
             setDeleteMode(false);
             dispatch(removeProduct(productNutrition))
             toast.success(`Продукт ${productNutrition.name} успішно видалений із бази даних!`)

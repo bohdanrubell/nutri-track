@@ -1,5 +1,5 @@
 import {createAsyncThunk, createEntityAdapter, createSlice} from "@reduxjs/toolkit";
-import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {RootState} from '../../app/store/store.ts';
 import {MetaData} from '../../app/models/pagination';
 import {ProductNutrition, ProductNutritionCategory, ProductNutritionParams} from "../../app/models/productNutrition.ts";
@@ -45,7 +45,7 @@ export const fetchProductsAsync = createAsyncThunk<ProductNutrition[], void, { s
     async (_, thunkAPI) => {
         const params = getParamsForServer(thunkAPI.getState().productNutrition.productParams);
         try {
-            const response = await api.ProductNutrition.list(params);
+            const response = await apiClient.ProductNutrition.list(params);
             thunkAPI.dispatch(setMetaData(response.metaData));
             return response.items;
         } catch (error: any) {
@@ -58,7 +58,7 @@ export const fetchProductAsync = createAsyncThunk<ProductNutrition, number>(
     'productNutrition/fetchProductAsync',
     async (productId, thunkAPI) => {
         try {
-            return await api.ProductNutrition.getProductById(productId);
+            return await apiClient.ProductNutrition.getProductById(productId);
         } catch (error: any) {
             return thunkAPI.rejectWithValue({ error: error.data })
         }
@@ -69,7 +69,7 @@ export const fetchCategories = createAsyncThunk<ProductNutritionCategory[]>(
     'productNutrition/fetchCategories',
     async (_, thunkAPI) => {
         try {
-            return api.ProductNutrition.fetchCategories();
+            return apiClient.ProductNutrition.fetchCategories();
         } catch (error: any) {
             return thunkAPI.rejectWithValue({error: error.message})
         }

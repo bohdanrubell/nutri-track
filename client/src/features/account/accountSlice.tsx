@@ -1,7 +1,7 @@
 import {User} from "../../app/models/user.ts";
 import {createAsyncThunk, createSlice, isAnyOf} from "@reduxjs/toolkit";
 import {FieldValues} from "react-hook-form";
-import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {router} from "../../app/router/Routes.tsx";
 import {toast} from "react-toastify";
 
@@ -17,7 +17,7 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
     'account/signInUser',
     async (data, thunkAPI) => {
         try {
-            const userDto = await api.Account.login({
+            const userDto = await apiClient.Account.login({
                 username: data.username,
                 password: data.password
             });
@@ -43,7 +43,7 @@ export const fetchCurrentUser = createAsyncThunk<User>(
             thunkAPI.dispatch(setUser(JSON.parse(storedUser)));
         }
         try {
-            const userDto = await api.Account.currentUser();
+            const userDto = await apiClient.Account.currentUser();
             const { ...user } = userDto;
             localStorage.setItem("user", JSON.stringify(user));
             return user;

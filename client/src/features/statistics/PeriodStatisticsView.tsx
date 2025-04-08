@@ -15,7 +15,7 @@ import {
     BarSeriesType,
     axisClasses
 } from "@mui/x-charts";
-import api from "../../app/api/api";
+import apiClient from "../../app/axios/apiClient.ts";
 
 interface PeriodStatisticsResponse {
     date: string;
@@ -31,7 +31,7 @@ export default function PeriodStatisticsView() {
     const [data, setData] = useState<PeriodStatisticsResponse[]>([]);
 
     useEffect(() => {
-        api.Diary.getStatisticsByPeriod(period)
+        apiClient.Diary.getStatisticsByPeriod(period)
             .then(res => setData(res))
             .catch(err => console.error("Error fetching stats", err));
     }, [period]);

@@ -16,7 +16,7 @@ import {
     Typography
 } from '@mui/material';
 import {axisClasses, LineChart, lineElementClasses, LinePlot} from '@mui/x-charts';
-import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {ActivityLevel, GoalType, ProfileFormData, UserCharacteristics} from "../../app/models/profileHelpers.ts";
 import {toast} from "react-toastify";
 
@@ -41,11 +41,11 @@ export default function Profile() {
     });
 
     useEffect(() => {
-        api.Account.getUserProfile()
+        apiClient.Account.getUserProfile()
             .then(setUserData)
             .catch(error => console.log(error));
-        api.Account.getGoalTypes().then(setGoals).catch(error => console.log(error));
-        api.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
+        apiClient.Account.getGoalTypes().then(setGoals).catch(error => console.log(error));
+        apiClient.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
     }, [dataUpdated]);
 
     useEffect(() => {
@@ -66,7 +66,7 @@ export default function Profile() {
 
     const handleSaveWeight = () => {
         if (!isNaN(newWeight.weight) && newWeight.weight > 0) {
-            api.Account.addNewWeightRecord({weight: newWeight.weight})
+            apiClient.Account.addNewWeightRecord({weight: newWeight.weight})
                 .then(() => {
                     toast.success("Успішно додано новий запис ваги!");
                     setDataUpdated(prev => !prev);
@@ -80,7 +80,7 @@ export default function Profile() {
     };
 
     const handleSaveProfile = () => {
-        api.Account.updateUserProfile(editedData)
+        apiClient.Account.updateUserProfile(editedData)
             .then(() => {
                 toast.success("Характеристики користувача успішно оновлено!");
                 setDataUpdated(prev => !prev);

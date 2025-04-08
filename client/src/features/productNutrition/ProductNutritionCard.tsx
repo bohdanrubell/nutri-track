@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { ProductNutrition } from "../../app/models/productNutrition";
 import {useState} from "react";
 import TextField from "@mui/material/TextField";
-import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {toast} from "react-toastify";
 import {useAppSelector} from "../../app/store/store.ts";
 
@@ -27,7 +27,7 @@ export default function ProductNutritionCard({ product }: Properties) {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            await api.Diary.addProductRecord({
+            await apiClient.Diary.addProductRecord({
                 productNutritionId: product.id,
                 consumedGrams: grams
             });

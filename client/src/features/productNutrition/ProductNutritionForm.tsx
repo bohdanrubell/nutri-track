@@ -10,6 +10,7 @@ import {validationSchema} from "./productNutritionValidation.ts";
 import useProductsNutrition from "../../app/hooks/useProductsNutrition.tsx";
 import AppSelectList from "../../app/components/AppSelectList.tsx";
 import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
 import {useDropzone} from "react-dropzone";
@@ -79,10 +80,10 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
             let response: ProductNutrition;
 
             if (productNutrition) {
-                response = await api.Admin.updateProductNutrition(formData);
+                response = await apiClient.Admin.updateProductNutrition(formData);
                 toast.success('Успішно оновлений продукт!');
             } else {
-                response = await api.Admin.createNewProductNutrition(formData);
+                response = await apiClient.Admin.createNewProductNutrition(formData);
                 toast.success('Успішно додано новий продукт!');
             }
 
