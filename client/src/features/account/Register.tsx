@@ -2,19 +2,16 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {createTheme, ThemeProvider} from '@mui/material/styles';
-import {Box, Paper, FormControl, InputLabel, Select, MenuItem} from "@mui/material";
+import {Box, Paper, FormControl, InputLabel, Select, MenuItem, Button} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {Controller, useForm} from "react-hook-form";
-import {LoadingButton} from "@mui/lab";
-import api from "../../app/api/api.ts";
+import apiClient from "../../app/axios/apiClient.ts";
 import {toast} from "react-toastify";
 import dayjs from 'dayjs';
 import {DatePicker} from "@mui/x-date-pickers";
 import {RegisterFormData} from "../../app/models/registerFormData.ts"
 import {useEffect, useState} from "react";
 import {ActivityLevel, GoalType} from "../../app/models/profileHelpers.ts";
-const defaultTheme = createTheme();
 
 export default function Register() {
     const [goals, setGoals] = useState<GoalType[]>([]);
@@ -26,8 +23,8 @@ export default function Register() {
     });
 
     useEffect(() => {
-        api.Account.getGoalTypes().then(setGoals).catch(error => console.log(error));
-        api.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
+        apiClient.Account.getGoalTypes().then(setGoals).catch(error => console.log(error));
+        apiClient.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
     }, []);
 
     function handleApiErrors(errors: any) {
@@ -58,16 +55,14 @@ export default function Register() {
     }
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Container component={Paper} maxWidth="sm" sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4}}>
+            <Container component={Paper} maxWidth="sm" sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2}}>
                 <Typography component="h1" variant="h5">Реєстрація користувача</Typography>
                 <Box component="form" onSubmit={handleSubmit((data) => {
                     const formattedData = {
                         ...data,
-                        dateOfBirth: dayjs(data.dateOfBirth).format('YYYY-MM-DD') // форматируем дату
+                        dateOfBirth: dayjs(data.dateOfBirth).format('YYYY-MM-DD')
                     };
-
-                    api.Account.register(formattedData)
+                    apiClient.Account.register(formattedData)
                         .catch((errors) => handleApiErrors(errors))
                         .then(() => {
                             toast.success('Регістрація успішна! Будь ласка, авторизуйтесь!');
@@ -203,9 +198,9 @@ export default function Register() {
                             </FormControl>
                         </Grid>
                     </Grid>
-                    <LoadingButton loading={isSubmitting} disabled={!isValid} type="submit" fullWidth variant="contained" sx={{mt: 3, mb: 2}}>
+                    <Button loading={isSubmitting} disabled={!isValid} type="submit" fullWidth variant="contained" sx={{mt: 3, mb: 2}}>
                         Зареєструватись
-                    </LoadingButton>
+                    </Button>
                     <Grid container direction="row" sx={{justifyContent: "center", alignItems: "center"}}>
                         <Grid>
                             <Link to='/login'>
@@ -215,6 +210,5 @@ export default function Register() {
                     </Grid>
                 </Box>
             </Container>
-        </ThemeProvider>
     )
 }

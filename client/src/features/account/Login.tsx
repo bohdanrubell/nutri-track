@@ -2,15 +2,12 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {createTheme,ThemeProvider } from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {FieldValues, useForm} from "react-hook-form";
 import {LoadingButton} from "@mui/lab";
 import {useAppDispatch} from "../../app/store/store.ts";
 import {signInUser} from "./accountSlice.tsx";
-
-const defaultTheme = createTheme();
 
 export default function Login() {
 
@@ -34,54 +31,52 @@ export default function Login() {
     }
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Container component={Paper} maxWidth="sm" sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4}}>
-                <Typography component="h1" variant="h5">
-                    Авторизація користувача
-                </Typography>
-                <Box component="form" onSubmit={handleSubmit(submitForm)} noValidate sx={{ mt: 1 }}>
-                    <TextField
-                        margin="normal"
-                        fullWidth
-                        label="Ім'я користувача"
-                        autoFocus
-                        {...register('username', {required: "Ім'я користувача є обов'язковим"})}
-                        error = {!!errors.username}
-                        helperText={errors?.username?.message as string}
-                    />
-                    <TextField
-                        margin="normal"
-                        fullWidth
-                        label="Пароль"
-                        type="password"
-                        autoComplete="current-password"
-                        {...register('password', {required: "Пароль користувача є обов'язковим"})}
-                        error = {!!errors.password}
-                        helperText={errors?.password?.message as string}
-                    />
-                    <LoadingButton loading={isSubmitting}
-                                   disabled={!isValid}
-                                   type="submit"
-                                   fullWidth
-                                   variant="contained" sx={{ mt: 3, mb: 2 }}
-                    >
-                        Авторизуватись
-                    </LoadingButton>
-                    <Grid container
-                          direction="row"
-                          sx={{
-                              justifyContent: "center",
-                              alignItems: "center",
-                          }}
-                    >
-                        <Grid>
-                            <Link to='/register'>
-                                {"Немає аккаунту? Зареєструйтесь!"}
-                            </Link>
-                        </Grid>
+        <Container component={Paper} maxWidth="sm" sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4}}>
+            <Typography component="h1" variant="h5">
+                Авторизація користувача
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit(submitForm)} noValidate sx={{ mt: 1 }}>
+                <TextField
+                    margin="normal"
+                    fullWidth
+                    label="Ім'я користувача"
+                    autoFocus
+                    {...register('username', {required: "Ім'я користувача є обов'язковим"})}
+                    error = {!!errors.username}
+                    helperText={errors?.username?.message as string}
+                />
+                <TextField
+                    margin="normal"
+                    fullWidth
+                    label="Пароль"
+                    type="password"
+                    autoComplete="current-password"
+                    {...register('password', {required: "Пароль користувача є обов'язковим"})}
+                    error = {!!errors.password}
+                    helperText={errors?.password?.message as string}
+                />
+                <LoadingButton loading={isSubmitting}
+                               disabled={!isValid}
+                               type="submit"
+                               fullWidth
+                               variant="contained" sx={{ mt: 3, mb: 2 }}
+                >
+                    Авторизуватись
+                </LoadingButton>
+                <Grid container
+                      direction="row"
+                      sx={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                      }}
+                >
+                    <Grid>
+                        <Link to='/register'>
+                            {"Немає аккаунту? Зареєструйтесь!"}
+                        </Link>
                     </Grid>
-                </Box>
-            </Container>
-        </ThemeProvider>
+                </Grid>
+            </Box>
+        </Container>
     )
 }
