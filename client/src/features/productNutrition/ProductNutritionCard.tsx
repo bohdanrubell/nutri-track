@@ -33,6 +33,7 @@ export default function ProductNutritionCard({ product }: Properties) {
             });
             setOpen(false);
             setGrams(100);
+            toast.success("Успішно створено новий запис спожитого продукту!")
         } catch {
             toast.error("Помилка при додаванні продукту до щоденнику!");
         } finally {

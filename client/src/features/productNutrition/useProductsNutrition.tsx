@@ -1,10 +1,10 @@
-import {useAppDispatch, useAppSelector} from "../store/store.ts";
+import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
 import {useEffect} from "react";
 import {
     fetchCategories,
     fetchProductsAsync,
     productNutritionSelectors
-} from "../../features/productNutrition/productNutritionSlice.ts";
+} from "./productNutritionSlice.ts";
 
 export default function useProductsNutrition() {
 
