@@ -25,32 +25,34 @@ function App() {
 
     useEffect(() => {
         initApp().then(() => setLoading(false));
-    }, [initApp])
+    }, [initApp]);
 
     const theme = createTheme({
         palette: {
-            primary: {
-                main: "#2e7d32",
-            },
-            secondary: {
-                main: "#81c784",
-            }
+            primary: { main: "#2e7d32" },
+            secondary: { main: "#81c784" }
         },
     });
 
-    if (loading) return <LoadingComponent message='Запускаємо застосунок...' />
+    if (loading) return <LoadingComponent message='Запускаємо застосунок...' />;
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {locate.pathname != '/' ? <Header /> : <HomePage />}
-            <Container>
-                <Outlet />
-            </Container>
-        </ThemeProvider>
-        </LocalizationProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
 
+                {locate.pathname === '/' ? (
+                    <HomePage />
+                ) : (
+                    <>
+                        <Header />
+                        <Container>
+                            <Outlet />
+                        </Container>
+                    </>
+                )}
+            </ThemeProvider>
+        </LocalizationProvider>
     );
 }
 

@@ -56,7 +56,7 @@ export default function ProductNutrition() {
                 </Paper>
                 <Paper sx={{ p: 2, maxHeight: 400, overflow: 'hidden' }}>
                     <CheckboxComponent
-                        availableItems={categories}
+                        availableItems={Array.isArray(categories) ? categories : []}
                         selectedItems={productParams.categories}
                         onChangeSelection={(items: ProductNutritionCategory[]) => dispatch(setProductParams({ categories: items }))}
                     />
@@ -67,11 +67,12 @@ export default function ProductNutrition() {
             </Grid>
             <Grid size={{xs: 3}}/>
             <Grid>
-                {metaData &&
+                {metaData && typeof metaData === 'object' && (
                     <PaginationComponent
                         metaData={metaData}
-                        onPageChange={(page: number) => dispatch(setPageNumber({pageNumber: page}))}
-                    />}
+                        onPageChange={(page: number) => dispatch(setPageNumber({ pageNumber: page }))}
+                    />
+                )}
             </Grid>
             {user?.roles?.includes('Admin') && (
                 <SpeedDial

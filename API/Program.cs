@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NutriTrack.Controllers;
 using NutriTrack.Data;
 using NutriTrack.Entities;
 using NutriTrack.Entity;
@@ -89,6 +90,9 @@ app.UseCors("AllowAllOrigins");
 
 app.UseException();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -98,6 +102,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapFallbackToController("Index", "Fallback");
 
 app.UseHttpsRedirection();
 

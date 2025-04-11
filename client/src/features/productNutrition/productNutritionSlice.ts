@@ -46,7 +46,9 @@ export const fetchProductsAsync = createAsyncThunk<ProductNutrition[], void, { s
         const params = getParamsForServer(thunkAPI.getState().productNutrition.productParams);
         try {
             const response = await apiClient.ProductNutrition.list(params);
-            thunkAPI.dispatch(setMetaData(response.metaData));
+            if (response.metaData) {
+                thunkAPI.dispatch(setMetaData(response.metaData));
+            }
             return response.items;
         } catch (error: any) {
             return thunkAPI.rejectWithValue({error: error.data})
@@ -105,7 +107,9 @@ export const productNutritionSlice = createSlice({
             state.productParams = {...state.productParams, ...action.payload}
         },
         setMetaData: (state, action) => {
-            state.metaData = action.payload
+            if (action.payload) {
+                state.metaData = action.payload;
+            }
         },
         resetProductParams: (state) => {
             state.productParams = initParams();
