@@ -1,12 +1,26 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NutriTrack.Entities;
 
 namespace NutriTrack.Data;
 
 public static class DbInitializer
 {
-    public static async Task Initialize(ApplicationDbContext context, UserManager<User> userManager)
+    public static async Task InitializeDataBase(WebApplication app)
     {
+        using var scope = app.Services.CreateScope();
+
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()
+                      ?? throw new InvalidOperationException("Failed to retrieve application context");
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>()
+                          ?? throw new InvalidOperationException("Failed to retrieve user manager");
+
+        await InitializeData(context, userManager);
+    }
+    private static async Task InitializeData(ApplicationDbContext context, UserManager<User> userManager)
+    {
+        await context.Database.MigrateAsync();
+        
         if (!userManager.Users.Any())
         {
             var user = new User

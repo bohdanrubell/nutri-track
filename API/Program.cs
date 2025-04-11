@@ -106,18 +106,6 @@ app.MapFallbackToController("Index", "Fallback");
 
 app.UseHttpsRedirection();
 
-
-var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-try
-{  
-    await DbInitializer.Initialize(context, userManager);
-}
-catch (Exception ex)
-{
-    logger.LogError(ex, "A problem occurred during migration");
-}
+await DbInitializer.InitializeDataBase(app);
 
 app.Run();
