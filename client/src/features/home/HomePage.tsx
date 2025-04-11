@@ -75,7 +75,7 @@ export default function HomePage() {
                 }}
             >
                 <Typography variant="h4" fontWeight="bold" mb={4}>
-                    Зручний веб-застосунок для керування своїм раціоном харчування!
+                    Зручний веб-застосунок для керування своїм раціоном харчування!(ТЕСТ ДЕПЛОЯ)
                 </Typography>
 
                 <Button
