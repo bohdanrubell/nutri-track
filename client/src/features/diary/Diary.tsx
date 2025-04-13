@@ -116,7 +116,7 @@ export default function Diary() {
                             <Grid><InfoBoxComponent label="Жири" value={`${totals?.fat ?? 0}/${dailyRecord.dailyNutritions.dailyFat ?? 0}`} color={getColor(totals?.fat ?? 0, dailyRecord.dailyNutritions.dailyFat ?? 0)} /></Grid>
                             <Grid><InfoBoxComponent label="Вуглеводи" value={`${totals?.carbohydrates ?? 0}/${dailyRecord.dailyNutritions.dailyCarbohydrates ?? 0}`} color={getColor(totals?.carbohydrates ?? 0, dailyRecord.dailyNutritions.dailyCarbohydrates ?? 0)} /></Grid>
                         </Grid>
-                        <Paper elevation={5} sx={{ maxHeight: 350, overflow: 'auto' }}>
+                        <Paper elevation={5} sx={{ maxHeight: 350, overflow: 'auto', boxShadow: 3, borderRadius: 3 }}>
                             <Table stickyHeader>
                                 <TableHead>
                                     <TableRow>
@@ -202,7 +202,6 @@ export default function Diary() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Додати продукт до щоденника</DialogTitle>
                 <DialogContent>
