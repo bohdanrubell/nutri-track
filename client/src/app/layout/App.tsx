@@ -1,4 +1,4 @@
-import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import {Container, CssBaseline, ThemeProvider, createTheme, GlobalStyles} from '@mui/material';
 import Header from './Header';
 import {useCallback, useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
@@ -41,6 +41,17 @@ function App() {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
 
+                <GlobalStyles styles={{
+                    body: {
+                        margin: 0,
+                        padding: 0,
+                        minHeight: '100vh',
+                        background: 'linear-gradient(135deg, #e0f7fa 0%, #c8e6c9 100%)',
+                        backgroundAttachment: 'fixed',
+                        backgroundSize: 'cover',
+                        fontFamily: 'Roboto, sans-serif',
+                    }
+                }} />
                 {locate.pathname === '/' ? (
                     <HomePage />
                 ) : (
