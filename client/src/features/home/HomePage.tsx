@@ -106,9 +106,13 @@ export default function HomePage() {
                             fontWeight: 'bold',
                         }}
                         onClick={() => {
-                            if (user) {
+                            if (user?.roles?.includes('User')) {
                                 navigate('/diary');
-                            } else {
+                            }
+                            if (user?.roles?.includes('Admin')){
+                                navigate('/productNutrition')
+                            }
+                            else {
                                 navigate('/register');
                             }
                         }}
