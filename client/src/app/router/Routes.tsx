@@ -20,7 +20,7 @@ export const router = createBrowserRouter(([
             {path: '/register', element: <Register/>},
             {path: '/profile', element: < Profile/>},
             {path: '/diary', element: < Diary/>},
-            {path: '*', element: <Navigate replace to='/'/>},
+            {path: '*', element: <Navigate replace to='/not-found'/>}
         ]
     }
 ]))
