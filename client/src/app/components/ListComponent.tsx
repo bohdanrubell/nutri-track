@@ -23,11 +23,8 @@ export default function ListComponent<TFieldValues extends FieldValues>(props: P
                 value={field.value ?? ''}
                 onBlur={field.onBlur}
                 label={props.label}
-                onChange={handleChange} // !!! тут тепер наша обробка
+                onChange={handleChange}
             >
-                <MenuItem value="">
-                    <em>Не обрано</em>
-                </MenuItem>
                 {props.items.map((item, index) => (
                     <MenuItem key={index} value={item}>
                         {item}
