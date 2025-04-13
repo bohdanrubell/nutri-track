@@ -23,7 +23,7 @@ interface FormProperties {
 export default function ProductNutritionForm({productNutrition, cancelCreate}: FormProperties) {
     const { control, handleSubmit, reset, formState: { isSubmitting, isDirty} } = useForm({
         resolver: yupResolver<any>(validationSchema),
-        mode: 'all',
+        mode: 'onBlur',
         reValidateMode: 'onBlur'
     });
     const dispatch = useAppDispatch();
@@ -57,7 +57,8 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
                 URL.revokeObjectURL(preview);
             }
         };
-    }, [productNutrition, reset, isDirty, selectedImage, preview]);
+    }, [productNutrition, reset, isDirty]);
+
 
     async function handleSubmitData(data: FieldValues) {
         try {
@@ -89,11 +90,8 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
             }
 
             dispatch(setProduct(response));
+            dispatch(fetchProductAsync(response.id))
             cancelCreate();
-            if (productNutrition) {
-                dispatch(fetchProductAsync(response.id));
-            }
-
         } catch (error) {
             console.log(error);
         }
