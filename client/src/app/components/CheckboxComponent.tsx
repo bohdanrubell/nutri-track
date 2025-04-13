@@ -2,6 +2,7 @@ import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ProductNutritionCategory } from "../models/productNutrition.ts";
 import SimpleBar from "simplebar-react";
+import Typography from "@mui/material/Typography";
 
 interface CheckboxComponentProps {
     availableItems: ProductNutritionCategory[];
@@ -28,7 +29,10 @@ export default function CheckboxComponent({ availableItems, selectedItems = [], 
 
     return (
         <SimpleBar style={{ maxHeight: 200 }}>
-        <FormGroup>
+            <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+                Вибір категорії
+            </Typography>
+            <FormGroup>
             {availableItems.map(item => (
                 <FormControlLabel
                     key={item.name}

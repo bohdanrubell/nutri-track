@@ -33,9 +33,14 @@ export default function ProductNutritionDetails() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if ((!productNutrition || updateMode) && id) dispatch(fetchProductAsync(parseInt(id)))
-    }, [id, productNutrition, dispatch, updateMode]);
+        if (!productNutrition && id) dispatch(fetchProductAsync(parseInt(id)))
+    }, [id, productNutrition, dispatch]);
 
+    useEffect(() => {
+        if (!updateMode && id) {
+            dispatch(fetchProductAsync(parseInt(id)));
+        }
+    }, [updateMode, id, dispatch]);
 
     function handleSelectProduct(product: ProductNutrition) {
         setSelectedProductNutrition(product);

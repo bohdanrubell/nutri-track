@@ -31,6 +31,7 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
+    const isEditMode = Boolean(productNutrition);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: { 'image/*': [] },
@@ -56,7 +57,8 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
                 URL.revokeObjectURL(preview);
             }
         };
-    }, [productNutrition, reset, isDirty, selectedImage, preview]);
+    }, [productNutrition, reset, isDirty]);
+
 
     async function handleSubmitData(data: FieldValues) {
         try {
@@ -88,11 +90,8 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
             }
 
             dispatch(setProduct(response));
+            dispatch(fetchProductAsync(response.id))
             cancelCreate();
-            if (productNutrition) {
-                dispatch(fetchProductAsync(response.id));
-            }
-
         } catch (error) {
             console.log(error);
         }
@@ -100,8 +99,10 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
 
     return (
         <Box component={Paper} sx={{p: 4}}>
-            <Typography variant="h5" fontStyle={'inherit'} display={'flex'} justifyContent={'center'} sx={{mb: 4}}>
-                Додавання нового/ Оновлення існуючого продукту харчування
+            <Typography variant="h5" fontStyle={'inherit'} display={'flex'} justifyContent={'center'} sx={{ mb: 4 }}>
+                {isEditMode
+                    ? `Оновлення продукту: ${productNutrition?.name}`
+                    : "Створення нового продукту"}
             </Typography>
             <Box {...getRootProps()} sx={{
                 border: '2px dashed gray',
@@ -148,7 +149,9 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
                 <Box display='flex' justifyContent='space-around' sx={{mt: 3}}>
                     <Button onClick={cancelCreate} variant='contained' color='inherit'>Скасувати</Button>
                     <LoadingButton loading={isSubmitting} type='submit' variant='contained'
-                                   color='success'>Додати</LoadingButton>
+                                   color='success'>
+                        {isEditMode ? "Оновити" : "Додати"}
+                    </LoadingButton>
                 </Box>
             </form>
         </Box>

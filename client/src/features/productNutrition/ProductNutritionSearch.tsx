@@ -16,7 +16,7 @@ export default function ProductNutritionSearch() {
     return (
         <TextField
             label='Введіть назву продукту'
-            variant='outlined'
+            variant="outlined"
             fullWidth
             value={searchTerm || ''}
             onChange={(event: any) => {

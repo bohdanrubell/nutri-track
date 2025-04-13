@@ -1,22 +1,30 @@
-import {TextField} from "@mui/material";
-import {useController, UseControllerProps} from "react-hook-form";
+import { TextField } from "@mui/material";
+import { useController, UseControllerProps, FieldValues } from "react-hook-form";
 
-interface Properties extends UseControllerProps {
+interface Properties<TFieldValues extends FieldValues> extends UseControllerProps<TFieldValues> {
     label: string;
     type?: string;
 }
 
-export default function InputComponent(properties: Properties){
-    const {fieldState,field} = useController({...properties, defaultValue: ''})
+export default function InputComponent<TFieldValues extends FieldValues>(properties: Properties<TFieldValues>) {
+    const { fieldState, field } = useController<TFieldValues>({...properties});
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = properties.type === 'number' ? Number(event.target.value) : event.target.value;
+        field.onChange(value);
+    };
+
     return (
         <TextField
+            margin="normal"
             fullWidth
-            variant="filled"
-            {...properties}
             {...field}
+            {...properties}
+            onChange={handleChange}
+            onBlur={field.onBlur}
             type={properties.type}
-            helperText={fieldState.error?.message}
             error={!!fieldState.error}
+            helperText={fieldState.error?.message}
         />
-    )
+    );
 }
