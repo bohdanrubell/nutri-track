@@ -43,7 +43,20 @@ export default function ProductNutritionCard({ product }: Properties) {
 
     return (
         <>
-        <Card sx={{ maxWidth: 250, p: 1, textAlign: 'center' }}>
+            <Card
+                sx={{
+                    maxWidth: 250,
+                    p: 1,
+                    textAlign: 'center',
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                        boxShadow: 6,
+                        transform: 'translateY(-5px)',
+                    },
+                }}
+            >
             <Tooltip title={product.name}>
                 <Typography
                     variant="subtitle1"
@@ -82,6 +95,7 @@ export default function ProductNutritionCard({ product }: Properties) {
             </CardContent>
 
             <CardActions sx={{ p: 1 }}>
+                {/* Перша кнопка: Детальніше або Налаштування */}
                 <Button
                     component={Link}
                     to={`/productNutrition/${product.id}`}
@@ -90,19 +104,23 @@ export default function ProductNutritionCard({ product }: Properties) {
                     color="primary"
                     fullWidth
                 >
-                    {user?.roles?.includes('User')
-                        ? "Детальніше"
-                        : "Налаштування"}
+                    {!user && "Детальніше"}
+                    {user?.roles?.includes('User') && "Детальніше"}
+                    {user?.roles?.includes('Admin') && "Налаштування"}
                 </Button>
-                {user!.roles!.includes('User') && <Button
-                    size="small"
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={() => setOpen(true)}
-                >
-                    Додати
-                </Button>}
+
+                {/* Друга кнопка: Додати тільки для користувачів із роллю User */}
+                {user?.roles?.includes('User') && (
+                    <Button
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={() => setOpen(true)}
+                    >
+                        Додати
+                    </Button>
+                )}
             </CardActions>
         </Card>
 

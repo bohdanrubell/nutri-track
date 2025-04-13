@@ -16,6 +16,7 @@ import ProductNutritionForm from "./ProductNutritionForm.tsx";
 import 'simplebar-react/dist/simplebar.min.css';
 import CategoryIcon from '@mui/icons-material/Category';
 import MenuIcon from '@mui/icons-material/Menu';
+import Typography from "@mui/material/Typography";
 
 const sortOptions = [
     { value: 'name', label: 'Від А до Я' },
@@ -34,6 +35,10 @@ export default function ProductNutrition() {
         setCreateMode(false);
     }
 
+    if (createMode && (!user?.roles?.includes('Admin'))) {
+        setCreateMode(false);
+    }
+
     if (createMode) return <ProductNutritionForm cancelCreate={cancelCreate}/>
 
 
@@ -41,20 +46,22 @@ export default function ProductNutrition() {
 
     return (
         <>
-
         <Grid container spacing={4}>
             <Grid size={{xs: 3}}>
-                <Paper sx={{ mb: 2 }}>
+                <Paper sx={{ mb: 2, borderRadius: 3, boxShadow: 3 }}>
                     <ProductNutritionSearch />
                 </Paper>
-                <Paper sx={{ p: 2, mb: 2 }}>
+                <Paper sx={{ p: 2, mb: 2, borderRadius: 3, boxShadow: 3 }}>
+                    <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+                        Сортування за:
+                    </Typography>
                     <RadioButtonGroupComponent
                         selectedValue={productParams.orderBy}
                         options={sortOptions}
                         onChange={(e) => dispatch(setProductParams({ orderBy: e.target.value }))}
                     />
                 </Paper>
-                <Paper sx={{ p: 2, maxHeight: 400, overflow: 'hidden' }}>
+                <Paper sx={{ p: 2, maxHeight: 400, overflow: 'hidden', borderRadius: 3, boxShadow: 3 }}>
                     <CheckboxComponent
                         availableItems={Array.isArray(categories) ? categories : []}
                         selectedItems={productParams.categories}
