@@ -51,6 +51,8 @@ public class AccountController : ControllerBase
     {
         await using var transaction = await _context.Database.BeginTransactionAsync();
 
+        registerRequest.Gender = registerRequest.Gender == "Чоловік" ? "Male" : "Female";
+        
         var user = new User
         {
             UserName = registerRequest.Username,
