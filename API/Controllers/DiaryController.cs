@@ -54,11 +54,11 @@ public class DiaryController : ControllerBase
                 {
                     Id = pr.Id,
                     Name = pr.ProductNutrition.Name,
-                    Grams = Math.Round(pr.Grams, 2),
+                    Grams = Math.Round(pr.Grams),
                     Calories = (int)Math.Round(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
-                    Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100, 2),
-                    Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100, 2),
-                    Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100, 2)
+                    Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100),
+                    Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100),
+                    Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100)
                 }).ToList()
             };
 
@@ -247,14 +247,19 @@ public class DiaryController : ControllerBase
                 .GroupBy(r => r.Date.Date)
                 .Select(g =>
                 {
-                    var calories = g.SelectMany(r => r.ProductRecords)
-                        .Sum(pr => (int)Math.Round(pr.Grams / 100.0 * pr.ProductNutrition.CaloriesPer100Grams));
-                    var proteins = g.SelectMany(r => r.ProductRecords)
+                    var totalCalories = g.SelectMany(r => r.ProductRecords)
+                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CaloriesPer100Grams);
+                    var totalProteins = g.SelectMany(r => r.ProductRecords)
                         .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.ProteinPer100Grams);
-                    var fats = g.SelectMany(r => r.ProductRecords)
+                    var totalFats = g.SelectMany(r => r.ProductRecords)
                         .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.FatPer100Grams);
-                    var carbs = g.SelectMany(r => r.ProductRecords)
+                    var totalCarbs = g.SelectMany(r => r.ProductRecords)
                         .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CarbohydratesPer100Grams);
+
+                    var calories = (int)Math.Round(totalCalories);
+                    var proteins = Math.Round(totalProteins);
+                    var fats = Math.Round(totalFats);
+                    var carbs = Math.Round(totalCarbs);
 
                     var first = g.First();
 
@@ -269,14 +274,15 @@ public class DiaryController : ControllerBase
                     {
                         Date = g.Key.ToString("yyyy-MM-dd"),
                         ConsumedCalories = calories,
-                        ConsumedProteins = Math.Round(proteins, 2),
-                        ConsumedFats = Math.Round(fats, 2),
-                        ConsumedCarbohydrates = Math.Round(carbs, 2),
+                        ConsumedProteins = proteins,
+                        ConsumedFats = fats,
+                        ConsumedCarbohydrates = carbs,
                         Status = status.ToString()
                     };
                 })
                 .OrderBy(d => d.Date)
                 .ToList();
+
 
             return Ok(dailyStats);
         }
@@ -296,22 +302,24 @@ public class DiaryController : ControllerBase
         double fats, double normFats,
         double carbs, double normCarbohydrates)
     {
-        var okCalories = calories >= normCalories;
-        var okProteins = proteins >= normProteins;
-        var okFats = fats >= normFats;
-        var okCarbs = carbs >= normCarbohydrates;
+        var results = new List<(bool isExceeded, bool isReached)>
+        {
+            (IsExceeded(calories, normCalories), IsReached(calories, normCalories)),
+            (IsExceeded(proteins, normProteins), IsReached(proteins, normProteins)),
+            (IsExceeded(fats, normFats), IsReached(fats, normFats)),
+            (IsExceeded(carbs, normCarbohydrates), IsReached(carbs, normCarbohydrates))
+        };
 
-        var overCalories = calories > normCalories * 1.15;
-        var overProteins = proteins > normProteins * 1.15;
-        var overFats = fats > normFats * 1.15;
-        var overCarbs = carbs > normCarbohydrates * 1.15;
-
-        if (overCalories || overProteins || overFats || overCarbs)
+        if (results.Any(r => r.isExceeded))
             return NormStatus.Exceeded;
 
-        if (okCalories && okProteins && okFats && okCarbs)
+        if (results.All(r => r.isReached))
             return NormStatus.Reached;
 
         return NormStatus.NotReached;
     }
+
+    private static bool IsExceeded(double value, double norm) => value > norm * 1.15;
+    private static bool IsReached(double value, double norm) => value >= norm;
+
 }
