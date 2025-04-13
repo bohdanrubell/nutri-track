@@ -8,6 +8,8 @@ export default function NotFoundComponent() {
         <Container component={Paper} sx={{ height: 400, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 4 }}>
             <Typography gutterBottom variant="h3" align="center">
                 Ой! Ми не змогли знайти те, що ви шукаєте.
+                <Divider/>
+                (Помилка: 404 - Сторінку на знайдено)
             </Typography>
             <Divider sx={{ my: 2, width: '100%' }} />
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 2 }}>
