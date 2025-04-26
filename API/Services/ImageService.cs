@@ -1,9 +1,10 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using NutriTrack.Tests;
 
 namespace NutriTrack.Services;
 
-public class ImageService
+public class ImageService : IImageService
 {
     private readonly Cloudinary _cloudinary;
 
@@ -68,6 +69,4 @@ public class ImageService
 
         return fileName;
     }
-
-
 }

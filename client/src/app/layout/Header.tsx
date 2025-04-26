@@ -1,10 +1,15 @@
-import { AppBar, Box, List, ListItem, Toolbar, Typography } from "@mui/material";
+import {AppBar, Box, List, ListItem, Switch, Toolbar, Typography} from "@mui/material";
 import { NavLink } from 'react-router-dom';
 import { useAppSelector } from '../store/store.ts';
 import UserMenu from "./UserMenu.tsx";
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import StorageIcon from '@mui/icons-material/Storage';
+
+interface HeaderProps {
+    toggleTheme: () => void;
+    darkMode: boolean;
+}
 
 const rightLinks = [
     { title: 'Авторизація', path: '/login' },
@@ -24,7 +29,7 @@ const navLinkStyles = {
     }
 }
 
-export default function Header() {
+export default function Header({ toggleTheme, darkMode }: HeaderProps) {
     const {user} = useAppSelector(state => state.account);
 
     return (
@@ -44,8 +49,8 @@ export default function Header() {
                     >
                         NutriTrack
                     </Typography>
+                    <Switch checked={darkMode} onChange={toggleTheme} />
                 </Box>
-
                 <List sx={{display: 'flex'}}>
                     <ListItem
                         component={NavLink}

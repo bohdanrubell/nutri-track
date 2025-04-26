@@ -8,11 +8,10 @@ import {
     Box,
     Grid,
     Stack,
-    Paper
+    Paper, Fade
 } from "@mui/material";
 import {
     BarChart,
-    BarSeriesType,
     axisClasses
 } from "@mui/x-charts";
 import apiClient from "../../app/axios/apiClient.ts";
@@ -29,43 +28,17 @@ interface PeriodStatisticsResponse {
 export default function PeriodStatisticsView() {
     const [period, setPeriod] = useState<'last3days' | 'currentweek' | 'previousweek'>('last3days');
     const [data, setData] = useState<PeriodStatisticsResponse[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         apiClient.Diary.getStatisticsByPeriod(period)
             .then(res => setData(res))
-            .catch(err => console.error("Error fetching stats", err));
+            .catch(err => console.error("Error fetching stats", err))
+            .finally(() => setLoading(false));
     }, [period]);
 
-    console.log(data)
-
     const xLabels = data.map(d => d.date);
-
-    const series: BarSeriesType[] = [
-        {
-            type: 'bar',
-            data: data.map(d => d.consumedCalories),
-            label: 'Калорії',
-            id: 'calories'
-        },
-        {
-            type: 'bar',
-            data: data.map(d => d.consumedProteins),
-            label: 'Білки',
-            id: 'proteins'
-        },
-        {
-            type: 'bar',
-            data: data.map(d => d.consumedFats),
-            label: 'Жири',
-            id: 'fats'
-        },
-        {
-            type: 'bar',
-            data: data.map(d => d.consumedCarbohydrates),
-            label: 'Вуглеводи',
-            id: 'carbohydrates'
-        }
-    ];
 
     function getStatusText(status: string) {
         switch (status) {
@@ -86,7 +59,7 @@ export default function PeriodStatisticsView() {
     }
 
     return (
-        <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
+        <Box sx={{ maxWidth: 1200, mx: "auto", p: 3}}>
             <Typography variant="h4" gutterBottom textAlign="center">
                 Статистика за спожиті КБЖВ
             </Typography>
@@ -106,17 +79,61 @@ export default function PeriodStatisticsView() {
 
             <Grid container spacing={4}>
                 <Grid item xs={12} md={7}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <BarChart
-                            xAxis={[{ scaleType: 'band', data: xLabels }]}
-                            series={series}
-                            height={400}
-                            sx={{
-                                [`.${axisClasses.left} .MuiTypography-root`]: { fontSize: 14 },
-                                [`.${axisClasses.bottom} .MuiTypography-root`]: { fontSize: 12 },
-                            }}
-                        />
-                    </Paper>
+                    {loading ? (
+                        <Typography textAlign="center" variant="h6" color="textSecondary">
+                            Завантаження даних...
+                        </Typography>
+                    ) : data.length === 0 ? (
+                        <Typography textAlign="center" variant="h6" color="textSecondary">
+                            Немає даних для вибраного періоду
+                        </Typography>
+                    ) : (
+                        <Fade in={!loading}>
+                            <Box>
+                                <Paper elevation={4} sx={{ p: 2, borderRadius: 3 }}>
+                                    <BarChart
+                                        xAxis={[{ scaleType: 'band', data: xLabels }]}
+                                        series={[
+                                            {
+                                                type: 'bar',
+                                                data: data.map(d => d.consumedCalories),
+                                                label: 'Калорії',
+                                                id: 'calories',
+                                                color: '#4caf50',
+                                            },
+                                            {
+                                                type: 'bar',
+                                                data: data.map(d => d.consumedProteins),
+                                                label: 'Білки',
+                                                id: 'proteins',
+                                                color: '#2196f3',
+                                            },
+                                            {
+                                                type: 'bar',
+                                                data: data.map(d => d.consumedFats),
+                                                label: 'Жири',
+                                                id: 'fats',
+                                                color: '#ff9800',
+                                            },
+                                            {
+                                                type: 'bar',
+                                                data: data.map(d => d.consumedCarbohydrates),
+                                                label: 'Вуглеводи',
+                                                id: 'carbohydrates',
+                                                color: '#f44336',
+                                            },
+                                        ]}
+                                        height={400}
+                                        tooltip={{ trigger: 'item' }}
+                                        sx={{
+                                            [`.${axisClasses.left} .MuiTypography-root`]: { fontSize: 14 },
+                                            [`.${axisClasses.bottom} .MuiTypography-root`]: { fontSize: 12 },
+                                        }}
+                                    />
+                                </Paper>
+                            </Box>
+                        </Fade>
+                    )}
                 </Grid>
 
                 <Grid item xs={12} md={5}>

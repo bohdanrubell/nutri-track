@@ -1,28 +1,38 @@
 import {FormControl, FormHelperText, InputLabel, MenuItem, Select} from "@mui/material";
-import {useController, UseControllerProps} from "react-hook-form";
+import {useController, UseControllerProps, FieldValues} from "react-hook-form";
 
-interface Properties extends UseControllerProps{
+interface Properties<TFieldValues extends FieldValues> extends UseControllerProps<TFieldValues> {
     label: string;
     items: string[];
 }
 
-export default function ListComponent(props: Properties) {
-    const {fieldState, field} = useController({...props, defaultValue: ''});
+export default function ListComponent<TFieldValues extends FieldValues>(props: Properties<TFieldValues>) {
+    const { fieldState, field } = useController<TFieldValues>({...props});
+
+    const handleChange = (event: any) => {
+        const value = event.target.value ?? '';
+        field.onChange(value);
+    };
+
     return (
-        <FormControl fullWidth error={!!fieldState.error}>
+        <FormControl fullWidth margin="normal" error={!!fieldState.error}>
             <InputLabel>{props.label}</InputLabel>
             <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={field.value}
+                value={field.value ?? ''}
+                onBlur={field.onBlur}
                 label={props.label}
-                onChange={field.onChange}
+                onChange={handleChange}
             >
                 {props.items.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                    <MenuItem key={index} value={item}>
+                        {item}
+                    </MenuItem>
                 ))}
             </Select>
             <FormHelperText>{fieldState.error?.message}</FormHelperText>
         </FormControl>
-    )
+    );
 }
+

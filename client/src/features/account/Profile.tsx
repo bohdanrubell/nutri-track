@@ -9,16 +9,17 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
-    Grid,
     MenuItem,
     Stack,
     TextField,
     Typography
 } from '@mui/material';
+import Grid from "@mui/material/Grid2"
 import {axisClasses, LineChart, lineElementClasses, LinePlot} from '@mui/x-charts';
 import apiClient from "../../app/axios/apiClient.ts";
 import {ActivityLevel, GoalType, ProfileFormData, UserCharacteristics} from "../../app/models/profileHelpers.ts";
 import {toast} from "react-toastify";
+import LoadingComponent from "../../app/components/LoadingComponent.tsx";
 
 interface WeightRecord {
     weight: number;
@@ -90,7 +91,7 @@ export default function Profile() {
     };
 
     if (!userData) {
-        return <Typography>Завантаження...</Typography>;
+        return <LoadingComponent message="Завантаження профілю..." />;
     }
 
     const translatedGender =
@@ -107,8 +108,8 @@ export default function Profile() {
     return (
         <Box sx={{maxWidth: 1200, mx: 'auto', my: 4, px: 2}}>
             <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                    <Card sx={{height: '100%'}}>
+                <Grid size={{xs: 12, md: 6}}>
+                    <Card sx={{height: '100%', boxShadow: 3, borderRadius: 3}}>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>Характеристики користувача</Typography>
                             <Stack spacing={1} mb={3}>
@@ -134,9 +135,8 @@ export default function Profile() {
                         </CardContent>
                     </Card>
                 </Grid>
-
-                <Grid item xs={12} md={6}>
-                    <Card sx={{height: '100%'}}>
+                <Grid size={{xs: 12, md: 6}}>
+                    <Card sx={{height: '100%', boxShadow: 3, borderRadius: 3}}>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>Аналітика ваги</Typography>
                             <Typography mb={1}><strong>Останній запис:</strong> {latestWeight}</Typography>
@@ -144,20 +144,24 @@ export default function Profile() {
 
                             <Typography variant="h6" gutterBottom>Графік змін ваги</Typography>
                             <Box sx={{height: 250}}>
-                                <LineChart
-                                    xAxis={[{scaleType: 'point', data: weightData.map(w => w.date)}]}
-                                    series={[{data: weightData.map(w => w.weight), label: 'Вага (кг)', type: 'line'}]}
-                                    height={250}
-                                    sx={{
-                                        [`& .${axisClasses.left} .MuiTypography-root`]: {fontSize: 12},
-                                        [`& .${axisClasses.bottom} .MuiTypography-root`]: {fontSize: 12},
-                                        [`& .${lineElementClasses.root}`]: {
-                                            strokeWidth: 2,
-                                        },
-                                    }}
-                                >
-                                    <LinePlot/>
-                                </LineChart>
+                                {weightData.length > 0 ? (
+                                    <LineChart
+                                        xAxis={[{scaleType: 'point', data: weightData.map(w => w.date)}]}
+                                        series={[{data: weightData.map(w => w.weight), label: 'Вага (кг)', type: 'line'}]}
+                                        height={250}
+                                        sx={{
+                                            [`& .${axisClasses.left} .MuiTypography-root`]: {fontSize: 12},
+                                            [`& .${axisClasses.bottom} .MuiTypography-root`]: {fontSize: 12},
+                                            [`& .${lineElementClasses.root}`]: {
+                                                strokeWidth: 2,
+                                            },
+                                        }}
+                                    >
+                                        <LinePlot/>
+                                    </LineChart>
+                                    ) : (
+                                    <Typography color="textSecondary">Немає даних для побудови графіка</Typography>
+                                    )}
                             </Box>
 
                             <Button variant="contained" color="secondary" sx={{mt: 2}} onClick={handleAddWeightClick}>
@@ -167,7 +171,6 @@ export default function Profile() {
                     </Card>
                 </Grid>
             </Grid>
-
             <Dialog open={openWeightDialog} onClose={handleCloseWeightDialog}>
                 <DialogTitle>Додати новий запис ваги</DialogTitle>
                 <DialogContent>
@@ -186,7 +189,6 @@ export default function Profile() {
                     <Button onClick={handleSaveWeight} variant="contained">Зберегти</Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
                 <DialogTitle>Редагувати характеристики</DialogTitle>
                 <DialogContent>
