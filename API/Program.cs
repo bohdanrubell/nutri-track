@@ -11,6 +11,7 @@ using NutriTrack.Entity;
 using NutriTrack.Middlewares;
 using NutriTrack.RequestHelpers;
 using NutriTrack.Services;
+using NutriTrack.Tests;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,9 +79,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<UserService>();
+
 
 builder.Services.AddHttpContextAccessor();
 
