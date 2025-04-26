@@ -61,9 +61,7 @@ jobs:
           dotnet-version: '8.x'
   
       - name: Run tests
-        run: |
-          cd server
-          dotnet test --configuration Release
+        run: dotnet test --configuration Release
 
   deploy:
     runs-on: windows-latest
