@@ -8,6 +8,7 @@ using NutriTrack.Entities;
 using NutriTrack.Extensions;
 using NutriTrack.RequestHelpers;
 using NutriTrack.Services;
+using NutriTrack.Tests;
 
 namespace NutriTrack.Controllers;
 
@@ -16,9 +17,9 @@ namespace NutriTrack.Controllers;
 public class ProductNutritionController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly ImageService _imageService; 
+    private readonly IImageService _imageService; 
 
-    public ProductNutritionController(ApplicationDbContext context, ImageService imageService)
+    public ProductNutritionController(ApplicationDbContext context, IImageService imageService)
     {
         _context = context;
         _imageService = imageService;
