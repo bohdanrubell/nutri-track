@@ -21,13 +21,8 @@ export default function Login() {
     });
 
     async function submitForm(data: FieldValues) {
-        try{
-            await dispatch(signInUser(data));
-            navigate(location.state?.from || '/productNutrition');
-        } catch (error) {
-            console.log(error);
-        }
-
+        await dispatch(signInUser(data));
+        navigate(location.state?.from || '/productNutrition');
     }
 
     return (

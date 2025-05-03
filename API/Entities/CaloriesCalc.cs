@@ -2,12 +2,12 @@
 
 namespace NutriTrack.Entities;
 
-public class CaloriesCalc(Gender gender, int age, int height, double weight, ActivityLevel activityLevel, GoalType goalType)
+public class CaloriesCalc(Gender gender, int age, int height, int weight, ActivityLevel activityLevel, GoalType goalType)
 {
     private Gender UserGender { get; set; } = gender;
     private int Age { get; set; } = age;
     private int Height { get; set; } = height;
-    private double Weight { get; set; } = weight;
+    private int Weight { get; set; } = weight;
     private ActivityLevel Activity { get; set; } = activityLevel;
     private GoalType Goal { get; set; } = goalType;
 

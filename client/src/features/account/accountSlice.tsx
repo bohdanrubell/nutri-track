@@ -29,7 +29,6 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
             }
             return user;
         }catch (error: any){
-            toast.error("Сталась помилка! Спробуйте пізніше.")
             return thunkAPI.rejectWithValue({error: error.data});
         }
     }
