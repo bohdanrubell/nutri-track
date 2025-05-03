@@ -77,59 +77,47 @@ public class DiaryController : ControllerBase
     [HttpPost("addNewProductRecord")]
     public async Task<ActionResult> AddProductToRecord(ProductRecordRequest productRecordRequest)
     {
+        if (productRecordRequest == null || productRecordRequest.ProductNutritionId <= 0)
+        {
+            return BadRequest("Invalid product record request.");
+        }
+    
         try
         {
             var user = await _userService.GetUserAsync();
-
             var currentDate = productRecordRequest.Date?.Date ?? DateTime.UtcNow.Date;
-
-            var diary = await _context.Diaries
-                .Include(d => d.Records)
-                .FirstAsync(d => d.UserId == user.Id);
-
-            var record = diary.Records.FirstOrDefault(r => r.Date == currentDate);
-            if (record is null)
-            {
-                var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
-
-                var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
-
-                var userWeightRecord = await _context.WeightRecords
-                    .Include(w => w.User)
-                    .Where(w => w.User.Id == user.Id)
-                    .OrderByDescending(w => w.DateOfRecordCreated)
-                    .Select(w => new WeightRecordResponse
-                    {
-                        Weight = w.Weight
-                    })
-                    .FirstAsync();
-
-                var age = DateTime.Now.Year - user.DateOfBirth.Year;
-
-                if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
-
-                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, userWeightRecord.Weight,
-                    userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
-
-                record = Record.Create(currentDate,
-                    calculator.CalculateDailyCalories(), calculator.CalculateDailyProtein(),
-                    calculator.CalculateDailyFat()
-                    , calculator.CalculateDailyCarbohydrates(), diary, userCurrentActivityLevel, userCurrentGoalType);
-
-                await _context.Records.AddAsync(record);
-            }
-
+    
+            var record = await GetOrCreateRecordAsync(user.Id, currentDate);
+    
             var productNutrition = await _context.ProductNutritions
                 .FirstOrDefaultAsync(p => p.Id == productRecordRequest.ProductNutritionId);
-
-            if (productNutrition is null) return NotFound("Продукт не знайдено");
-
+    
+            if (productNutrition == null)
+            {
+                return NotFound("Продукт не знайдено");
+            }
+    
+            var isProductAlreadyAdded = await _context.ProductRecords
+                .AnyAsync(p => p.RecordId == record.Id && p.ProductNutritionId == productRecordRequest.ProductNutritionId);
+    
+           if (isProductAlreadyAdded)
+            {
+                var existingProductRecord = await _context.ProductRecords
+                    .FirstOrDefaultAsync(p => p.RecordId == record.Id && p.ProductNutritionId == productRecordRequest.ProductNutritionId);
+            
+                if (existingProductRecord != null)
+                {
+                    existingProductRecord.Grams += productRecordRequest.ConsumedGrams;
+                    await _context.SaveChangesAsync();
+                    return Ok(existingProductRecord.Id);
+                }
+            }
+    
             var newProductRecord = ProductRecord.Create(record, productNutrition, productRecordRequest.ConsumedGrams);
-
+    
             await _context.ProductRecords.AddAsync(newProductRecord);
-
             await _context.SaveChangesAsync();
-
+    
             return Ok(newProductRecord.Id);
         }
         catch (UserIsNotAuthorizedException exception)
@@ -140,6 +128,58 @@ public class DiaryController : ControllerBase
         {
             return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
         }
+        catch (Exception exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = exception.Message });
+        }
+    }
+    
+    private async Task<Record> GetOrCreateRecordAsync(int userId, DateTime currentDate)
+    {
+        var diary = await _context.Diaries
+            .Include(d => d.Records)
+            .FirstOrDefaultAsync(d => d.UserId == userId);
+    
+        if (diary == null)
+        {
+            throw new InvalidOperationException("Diary not found for the user.");
+        }
+    
+        var record = diary.Records.FirstOrDefault(r => r.Date == currentDate);
+        if (record != null)
+        {
+            return record;
+        }
+    
+        var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(userId);
+        var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(userId);
+        var userWeightRecord = await _context.WeightRecords
+            .Where(w => w.User.Id == userId)
+            .OrderByDescending(w => w.DateOfRecordCreated)
+            .Select(w => new { w.Weight })
+            .FirstOrDefaultAsync();
+    
+        if (userWeightRecord == null)
+        {
+            throw new InvalidOperationException("User weight record not found.");
+        }
+    
+        var user = await _userService.GetUserAsync();
+        var age = DateTime.Now.Year - user.DateOfBirth.Year;
+        if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
+    
+        var calculator = new CaloriesCalc(user.UserGender, age, user.Height, userWeightRecord.Weight,
+            userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+    
+        record = Record.Create(currentDate,
+            calculator.CalculateDailyCalories(), calculator.CalculateDailyProtein(),
+            calculator.CalculateDailyFat(), calculator.CalculateDailyCarbohydrates(),
+            diary, userCurrentActivityLevel, userCurrentGoalType);
+    
+        await _context.Records.AddAsync(record);
+        await _context.SaveChangesAsync();
+    
+        return record;
     }
 
     [HttpPut("updateProductRecord")]

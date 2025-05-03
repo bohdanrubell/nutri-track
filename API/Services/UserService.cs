@@ -52,5 +52,14 @@ public class UserService
             .OrderByDescending(u => u.Date)
             .FirstAsync();
     }
+ 
+    public async Task<int> GetLatestWeightRecordAsync(int userId)
+    {
+        return await _context.WeightRecords
+            .Where(w => w.User.Id == userId)
+            .OrderByDescending(w => w.DateOfRecordCreated)
+            .Select(w => w.Weight)
+            .FirstAsync();
+    }
     
 }

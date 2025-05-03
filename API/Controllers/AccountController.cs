@@ -198,11 +198,29 @@ public class AccountController : ControllerBase
                 var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
                 await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
             }
-
-            await _context.SaveChangesAsync(cancellationToken);
-
+            
             await _userManager.UpdateAsync(user);
+            
+            var todayRecord = await _context.Records
+                .FirstAsync(r => r.Date.Date == DateTime.Today 
+                                          && r.Diary.User.Id == user.Id, 
+                    cancellationToken);
+            
+            var age = DateTime.Now.Year - user.DateOfBirth.Year;
+            if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
 
+            var weight = await _userService.GetLatestWeightRecordAsync(user.Id);
+            
+            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, weight,
+                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+            
+            todayRecord.DailyCalories = calculator.CalculateDailyCalories();
+            todayRecord.DailyProtein = calculator.CalculateDailyProtein();
+            todayRecord.DailyFat = calculator.CalculateDailyFat();
+            todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+            
+            await _context.SaveChangesAsync(cancellationToken);
+            
             await transaction.CommitAsync(cancellationToken);
 
             return NoContent();
@@ -227,6 +245,27 @@ public class AccountController : ControllerBase
 
             var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
             await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
+            
+            var todayRecord = await _context.Records
+                .FirstAsync(r => r.Date.Date == DateTime.Today 
+                                 && r.Diary.User.Id == user.Id, 
+                    cancellationToken);
+            
+            var age = DateTime.Now.Year - user.DateOfBirth.Year;
+            if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
+            
+            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+
+            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+            
+            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, newWeightRecord.Weight,
+                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+            
+            todayRecord.DailyCalories = calculator.CalculateDailyCalories();
+            todayRecord.DailyProtein = calculator.CalculateDailyProtein();
+            todayRecord.DailyFat = calculator.CalculateDailyFat();
+            todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+            
             await _context.SaveChangesAsync(cancellationToken);
 
             return NoContent();
