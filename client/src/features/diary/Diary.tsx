@@ -30,6 +30,10 @@ export default function Diary() {
     const [loadingProducts, setLoadingProducts] = useState(false);
     const [addingProduct, setAddingProduct] = useState(false);
 
+    const isFutureDate = () => {
+        return selectedDate.isAfter(dayjs(), 'day');
+    };
+
     useEffect(() => {
         apiClient.Diary.getRecordByDate(selectedDate.format('YYYY-MM-DD'))
             .then(setDailyRecord)
@@ -100,10 +104,12 @@ export default function Diary() {
                 </Typography>
 
                 <Grid container justifyContent="center" mb={2}>
-                    <Button
+                <Button
                         variant="contained"
                         color="primary"
                         onClick={handleOpenAddProductDialog}
+                        disabled={isFutureDate()}
+                        title={isFutureDate() ? "Неможливо додати продукт на майбутню дату" : ""}
                     >
                         Додати продукт
                     </Button>
