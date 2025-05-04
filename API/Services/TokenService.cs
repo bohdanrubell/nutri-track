@@ -14,13 +14,13 @@ public class TokenService(UserManager<User> userManager, IConfiguration configur
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName)
+            new("email", user.Email),
+            new("userId", user.Id.ToString()),
+            new("userName", user.UserName)
         };
 
         var roles = await userManager.GetRolesAsync(user);
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.AddRange(roles.Select(role => new Claim("role", role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTSettings:TokenKey"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);

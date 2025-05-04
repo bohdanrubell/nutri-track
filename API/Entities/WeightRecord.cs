@@ -1,13 +1,11 @@
-﻿using NutriTrack.Entities;
-
-namespace NutriTrack.Entity;
+﻿namespace NutriTrack.Entities;
 
 public class WeightRecord
 {
     public int Id { get; set; }
     public DateTime DateOfRecordCreated { get; set; }
     public int Weight { get; set; }
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
 
     public User User { get; set; }
 

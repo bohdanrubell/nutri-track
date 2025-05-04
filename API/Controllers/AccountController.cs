@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ public class AccountController : ControllerBase
 
         return new UserResponse
         {
-            Id = user.Id,
+            Id = user.Id.ToString(),
             Username = user.UserName!,
             Token = await _tokenService.GenerateToken(user)
         };
@@ -142,7 +143,8 @@ public class AccountController : ControllerBase
             var userCharResponse = new UserCharacteristicsResponse
             {
                 Gender = user.UserGender.ToString(),
-                DateOfBirth = user.DateOfBirth.ToString("dd/MM/yyyy"),
+                DateOfBirth = user.DateOfBirth.ToString("dd MMMM yyyy", new CultureInfo("uk-UA"))
+                ,
                 Age = age,
                 Height = user.Height,
                 CurrentGoalType = userCurrentGoalType.Goal.Name,
@@ -191,12 +193,14 @@ public class AccountController : ControllerBase
             {
                 var newActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
                 await _context.ActivityLevelLogs.AddAsync(newActivityLevelLog, cancellationToken);
+                userCurrentActivityLevel = newActivityLevelLog;
             }
 
             if (userCurrentGoalType.Goal.Name != request.CurrentGoalType)
             {
                 var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
                 await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
+                userCurrentGoalType = initialGoalTypeLog;
             }
             
             await _userManager.UpdateAsync(user);
@@ -289,7 +293,7 @@ public class AccountController : ControllerBase
 
             return new UserResponse
             {
-                Id = user.Id,
+                Id = user.Id.ToString(),
                 Username = user.UserName!,
                 Token = await _tokenService.GenerateToken(user)
             };

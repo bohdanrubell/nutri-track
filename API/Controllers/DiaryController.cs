@@ -54,11 +54,11 @@ public class DiaryController : ControllerBase
                 {
                     Id = pr.Id,
                     Name = pr.ProductNutrition.Name,
-                    Grams = Math.Round(pr.Grams),
-                    Calories = (int)Math.Round(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
-                    Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100),
-                    Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100),
-                    Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100)
+                    Grams = pr.Grams,
+                    Calories = (int)(pr.ProductNutrition.CaloriesPer100Grams * pr.Grams / 100),
+                    Protein = Math.Round(pr.ProductNutrition.ProteinPer100Grams * pr.Grams / 100, 1),
+                    Fat = Math.Round(pr.ProductNutrition.FatPer100Grams * pr.Grams / 100,1),
+                    Carbohydrates = Math.Round(pr.ProductNutrition.CarbohydratesPer100Grams * pr.Grams / 100, 1)
                 }).ToList()
             };
 
@@ -134,7 +134,7 @@ public class DiaryController : ControllerBase
         }
     }
     
-    private async Task<Record> GetOrCreateRecordAsync(int userId, DateTime currentDate)
+    private async Task<Record> GetOrCreateRecordAsync(Guid userId, DateTime currentDate)
     {
         var diary = await _context.Diaries
             .Include(d => d.Records)
@@ -197,7 +197,7 @@ public class DiaryController : ControllerBase
 
             if (product is null) return NotFound("Продукт не знайдено");
 
-            product.Grams = Math.Round(productRecordRequest.ConsumedGrams, 2);
+            product.Grams = productRecordRequest.ConsumedGrams;
 
             await _context.SaveChangesAsync();
 
@@ -288,13 +288,13 @@ public class DiaryController : ControllerBase
                 .Select(g =>
                 {
                     var totalCalories = g.SelectMany(r => r.ProductRecords)
-                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CaloriesPer100Grams);
+                        .Sum(pr => pr.Grams / 100 * pr.ProductNutrition.CaloriesPer100Grams);
                     var totalProteins = g.SelectMany(r => r.ProductRecords)
-                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.ProteinPer100Grams);
+                        .Sum(pr => pr.Grams / 100 * pr.ProductNutrition.ProteinPer100Grams);
                     var totalFats = g.SelectMany(r => r.ProductRecords)
-                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.FatPer100Grams);
+                        .Sum(pr => pr.Grams / 100 * pr.ProductNutrition.FatPer100Grams);
                     var totalCarbs = g.SelectMany(r => r.ProductRecords)
-                        .Sum(pr => pr.Grams / 100.0 * pr.ProductNutrition.CarbohydratesPer100Grams);
+                        .Sum(pr => pr.Grams / 100 * pr.ProductNutrition.CarbohydratesPer100Grams);
 
                     var calories = (int)Math.Round(totalCalories);
                     var proteins = Math.Round(totalProteins);
@@ -317,8 +317,10 @@ public class DiaryController : ControllerBase
                         ConsumedProteins = proteins,
                         ConsumedFats = fats,
                         ConsumedCarbohydrates = carbs,
-                        Status = status.ToString()
+                        Status = status.Status.ToString(),
+                        ExceededNutrients = status.ExceededNutrients
                     };
+
                 })
                 .OrderBy(d => d.Date)
                 .ToList();
@@ -336,30 +338,49 @@ public class DiaryController : ControllerBase
         }
     }
 
-    private static NormStatus GetNormStatus(
+    private static NormStatusResult GetNormStatus(
         int calories, int normCalories,
-        double proteins, double normProteins,
-        double fats, double normFats,
-        double carbs, double normCarbohydrates)
+        decimal proteins, decimal normProteins,
+        decimal fats, decimal normFats,
+        decimal carbs, decimal normCarbohydrates)
     {
-        var results = new List<(bool isExceeded, bool isReached)>
+        var checks = new List<(string Name, bool IsExceeded, bool IsReached)>
         {
-            (IsExceeded(calories, normCalories), IsReached(calories, normCalories)),
-            (IsExceeded(proteins, normProteins), IsReached(proteins, normProteins)),
-            (IsExceeded(fats, normFats), IsReached(fats, normFats)),
-            (IsExceeded(carbs, normCarbohydrates), IsReached(carbs, normCarbohydrates))
+            Evaluate("Калорії", calories, normCalories),
+            Evaluate("Білки", proteins, normProteins),
+            Evaluate("Жири", fats, normFats),
+            Evaluate("Вуглеводи", carbs, normCarbohydrates)
         };
 
-        if (results.Any(r => r.isExceeded))
-            return NormStatus.Exceeded;
+        var exceeded = checks.Where(c => c.IsExceeded).Select(c => c.Name).ToList();
 
-        if (results.All(r => r.isReached))
-            return NormStatus.Reached;
+        var status = exceeded.Any()
+            ? NormStatus.Exceeded
+            : checks.All(c => c.IsReached)
+                ? NormStatus.Reached
+                : NormStatus.NotReached;
 
-        return NormStatus.NotReached;
+        return new NormStatusResult
+        {
+            Status = status,
+            ExceededNutrients = exceeded
+        };
     }
 
-    private static bool IsExceeded(double value, double norm) => value > norm * 1.15;
-    private static bool IsReached(double value, double norm) => value >= norm;
+
+    private static (string Name, bool IsExceeded, bool IsReached) Evaluate(string name, int value, int norm)
+    {
+        bool exceeded = value > norm * 1.15;
+        bool reached = value >= norm;
+        return (name, exceeded, reached);
+    }
+
+    private static (string Name, bool IsExceeded, bool IsReached) Evaluate(string name, decimal value, decimal norm)
+    {
+        bool exceeded = value > norm * 1.15m;
+        bool reached = value >= norm;
+        return (name, exceeded, reached);
+    }
+
 
 }

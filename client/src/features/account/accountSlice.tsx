@@ -62,13 +62,15 @@ export const accountSlice = createSlice({
     initialState: initState,
     reducers: {
         signOut: (state) => {
+            router.navigate('/', { state: { intentional: true } });
             state.user = null;
             localStorage.removeItem('user');
-            router.navigate('/');
         },
         setUser: (state, action) => {
             const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
-            const roles = claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+            console.log(claims);
+            const roles = claims['role']
+            console.log(roles)
             state.user = {...action.payload, roles: typeof (roles) === 'string' ? [roles] : roles};
         }
     },
@@ -81,7 +83,7 @@ export const accountSlice = createSlice({
         })
         builder.addMatcher(isAnyOf(signInUser.fulfilled, fetchCurrentUser.fulfilled), (state,action) => {
             const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
-            const roles = claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+            const roles = claims['role']
             state.user = {...action.payload, roles: typeof (roles) === 'string' ? [roles] : roles};
         });
         builder.addMatcher(isAnyOf(signInUser.rejected), (_state, action) => {

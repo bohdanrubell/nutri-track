@@ -22,7 +22,7 @@ public class UserService
 
     public async Task<User> GetUserAsync()
     {
-        var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue("userId");
 
         if (userId is null) throw new UserIsNotAuthorizedException();
 
@@ -33,7 +33,7 @@ public class UserService
         return user;
     }
     
-    public async Task<GoalTypeLog> GetLastUsersGoalTypeLog(int userId)
+    public async Task<GoalTypeLog> GetLastUsersGoalTypeLog(Guid userId)
     {
         return await _context.GoalTypeLogs
             .Include(u => u.User)
@@ -43,7 +43,7 @@ public class UserService
             .FirstAsync();
     }
     
-    public async Task<ActivityLevelLog> GetLastUserActivityLevelLog(int userId)
+    public async Task<ActivityLevelLog> GetLastUserActivityLevelLog(Guid userId)
     {
         return await _context.ActivityLevelLogs
             .Include(u => u.User)
@@ -53,7 +53,7 @@ public class UserService
             .FirstAsync();
     }
  
-    public async Task<int> GetLatestWeightRecordAsync(int userId)
+    public async Task<int> GetLatestWeightRecordAsync(Guid userId)
     {
         return await _context.WeightRecords
             .Where(w => w.User.Id == userId)

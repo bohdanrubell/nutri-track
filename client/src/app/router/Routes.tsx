@@ -8,20 +8,26 @@ import Diary from "../../features/diary/Diary.tsx";
 import ProductNutritionDetails from "../../features/productNutrition/ProductNutritionDetails.tsx";
 import PeriodStatisticsView from "../../features/statistics/PeriodStatisticsView.tsx";
 import NotFoundComponent from "../components/NotFoundComponent.tsx";
+import AuthOnly from "./AuthOnly.tsx";
 
 export const router = createBrowserRouter(([
     {
         path: '/',
         element: <App/>,
         children: [
+            {
+                element: <AuthOnly roles={['User']}/>, children: [
+                    {path: '/statistics', element: <PeriodStatisticsView/>},
+                    {path: '/profile', element: < Profile/>},
+                    {path: '/diary', element: < Diary/>}
+                ]
+            },
             {path: '/login', element: <Login/>},
             {path: '/productNutrition', element: <ProductNutrition/>},
             {path: '/productNutrition/:id', element: <ProductNutritionDetails/>},
-            {path: '/statistics', element: <PeriodStatisticsView/>},
+
             {path: '/register', element: <Register/>},
             { path: '/not-found', element: <NotFoundComponent /> },
-            {path: '/profile', element: < Profile/>},
-            {path: '/diary', element: < Diary/>},
             {path: '*', element: <Navigate replace to='/not-found'/>}
         ]
     }

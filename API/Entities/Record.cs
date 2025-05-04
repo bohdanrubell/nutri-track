@@ -5,9 +5,9 @@ public class Record
     public int Id { get; set; }
     public DateTime Date { get; set; }
     public int DailyCalories { get; set; }
-    public double DailyProtein { get; set; }
-    public double DailyFat { get; set; }
-    public double DailyCarbohydrates { get; set; }
+    public decimal DailyProtein { get; set; }
+    public decimal DailyFat { get; set; }
+    public decimal DailyCarbohydrates { get; set; }
 
     public int DiaryId { get; set; }
     public Diary Diary { get; set; }
@@ -21,16 +21,16 @@ public class Record
     public List<ProductRecord> ProductRecords { get; set; }
 
 
-    public static Record Create(DateTime date, int dailyCalories, double dailyProtein, double dailyFat,
-        double dailyCarbohydrates, Diary diary, ActivityLevelLog activityLog, GoalTypeLog goalLog)
+    public static Record Create(DateTime date, int dailyCalories, decimal dailyProtein, decimal dailyFat,
+        decimal dailyCarbohydrates, Diary diary, ActivityLevelLog activityLog, GoalTypeLog goalLog)
     {
         var record = new Record
         {
             Date = date,
             DailyCalories = dailyCalories,
-            DailyProtein = Math.Round(dailyProtein, 2),
-            DailyFat = Math.Round(dailyFat,2),
-            DailyCarbohydrates = Math.Round(dailyCarbohydrates,2),
+            DailyProtein = Math.Round(dailyProtein, 1),
+            DailyFat = Math.Round(dailyFat,1),
+            DailyCarbohydrates = Math.Round(dailyCarbohydrates,1),
             Diary = diary,
             ActivityLog = activityLog,
             GoalLog = goalLog,

@@ -23,6 +23,7 @@ interface PeriodStatisticsResponse {
     consumedFats: number;
     consumedCarbohydrates: number;
     status: 'NotReached' | 'Reached' | 'Exceeded';
+    exceededNutrients?: string[];
 }
 
 export default function PeriodStatisticsView() {
@@ -155,9 +156,16 @@ export default function PeriodStatisticsView() {
                                 }}
                                 elevation={1}
                             >
-                                <Typography fontWeight={500}>
-                                    {day.date} — {getStatusText(day.status)}
-                                </Typography>
+                                <>
+                                    <Typography fontWeight={500}>
+                                        {day.date} — {getStatusText(day.status)}
+                                    </Typography>
+                                    {day.exceededNutrients && day.exceededNutrients.length > 0 && (
+                                        <Typography variant="body2" color="text.secondary">
+                                            Перевищено: {day.exceededNutrients.join(', ')}
+                                        </Typography>
+                                    )}
+                                </>
                             </Paper>
                         ))}
                     </Stack>
