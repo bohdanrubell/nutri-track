@@ -227,15 +227,15 @@ public class ProductNutritionController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPost("category/add")]
-    public async Task<ActionResult> AddNewProductNutritionCategory([Required]string categoryName)
+    public async Task<ActionResult> AddNewProductNutritionCategory([FromBody] CreateProductCategoryRequest request)
     {
-        var isCategoryExist = await _context.ProductNutritionCategories.AnyAsync(c => c.Name == categoryName);
+        var isCategoryExist = await _context.ProductNutritionCategories.AnyAsync(c => c.Name == request.CategoryName);
 
-        if (isCategoryExist) return Conflict($"Категорія з назвою {categoryName} існує в базі даних!");
+        if (isCategoryExist) return Conflict($"Категорія з назвою {request.CategoryName} існує в базі даних!");
 
         var newCategory = new ProductNutritionCategory
         {
-            Name = categoryName
+            Name = request.CategoryName
         };
         
         await _context.ProductNutritionCategories.AddAsync(newCategory);

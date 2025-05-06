@@ -99,7 +99,9 @@ const Diary = {
 const Admin = {
     createNewProductNutrition: (value: any) => requests.post('productNutrition/create', value),
     deleteProductNutrition: (id: number) => requests.delete(`productNutrition/${id}`),
-    updateProductNutrition: (value: any) => requests.put(`productNutrition/update`, value)
+    updateProductNutrition: (value: any) => requests.put(`productNutrition/update`, value),
+    addProductCategory: (value: any) => requests.post('productNutrition/category/add', value),
+    deleteProductCategory: (id: number) => requests.delete(`productNutrition/category/${id}`)
 }
 
 const apiClient = {
