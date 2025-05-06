@@ -71,7 +71,14 @@ const Account = {
     updateUserProfile: (values: ProfileFormData) => requests.put('account/profile', values),
     getActivityLevels: () => requests.get('account/activityLevels'),
     getGoalTypes: () => requests.get('account/goalTypes'),
-    addNewWeightRecord: (values: any) => requests.post('account/addWeightRecord', values)
+    addNewWeightRecord: (values: any) => requests.post('account/addWeightRecord', values),
+    forgotPassword: (email: string) => requests.post('account/forgot-password', { email }),
+    resetPassword: (email: string, token: string, newPassword: string) => 
+        requests.post('account/reset-password', { 
+            email,
+            token,
+            newPassword
+        })
 }
 
 const ProductNutrition = {

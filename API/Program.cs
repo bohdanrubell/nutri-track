@@ -11,6 +11,7 @@ using NutriTrack.Entity;
 using NutriTrack.Middlewares;
 using NutriTrack.RequestHelpers;
 using NutriTrack.Services;
+using NutriTrack.Services.Interfaces;
 using NutriTrack.Tests;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,7 +64,10 @@ builder.Services.AddIdentityCore<User>(opt =>
     opt.User.RequireUniqueEmail = true;
 })
 .AddRoles<Role>()
+.AddDefaultTokenProviders()
 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
@@ -82,6 +86,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 
 builder.Services.AddHttpContextAccessor();

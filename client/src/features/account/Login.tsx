@@ -59,15 +59,21 @@ export default function Login() {
                     Авторизуватись
                 </LoadingButton>
                 <Grid container
-                      direction="row"
+                      direction="column"
                       sx={{
                           justifyContent: "center",
                           alignItems: "center",
+                          gap: 1
                       }}
                 >
                     <Grid>
                         <Link to='/register'>
                             {"Немає аккаунту? Зареєструйтесь!"}
+                        </Link>
+                    </Grid>
+                    <Grid>
+                        <Link to='/forgot-password'>
+                            {"Забули пароль?"}
                         </Link>
                     </Grid>
                 </Grid>

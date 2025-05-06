@@ -22,7 +22,7 @@ export default function AuthOnly({roles}: Props) {
         
         if (!user) {
             toast.warning('Ви повинні бути авторизованим!');
-        } else if (roles && !roles?.some(r => user.roles?.includes(r))) {
+        } else if (roles && user.roles && !roles.some(r => user.roles?.includes(r))) {
             toast.error('Заборонена дія!');
             navigate(-1);
             return;
@@ -33,8 +33,7 @@ export default function AuthOnly({roles}: Props) {
         return <Navigate to='/login' state={{from: location}} />;
     }
 
-
-    if (roles && !roles?.some(r => user.roles?.includes(r))) {
+    if (roles && user.roles && !roles.some(r => user.roles?.includes(r))) {
         toast.error('Заборонена дія!');
         navigate(-1);
         return null;

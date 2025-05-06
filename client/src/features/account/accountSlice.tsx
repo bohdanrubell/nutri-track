@@ -67,11 +67,19 @@ export const accountSlice = createSlice({
             localStorage.removeItem('user');
         },
         setUser: (state, action) => {
-            const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
-            console.log(claims);
-            const roles = claims['role']
-            console.log(roles)
-            state.user = {...action.payload, roles: typeof (roles) === 'string' ? [roles] : roles};
+            try {
+                const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
+                console.log(claims);
+                const roles = claims['role'] || [];
+                console.log(roles);
+                state.user = {
+                    ...action.payload, 
+                    roles: typeof (roles) === 'string' ? [roles] : (Array.isArray(roles) ? roles : [])
+                };
+            } catch (error) {
+                console.error('Error parsing JWT token:', error);
+                state.user = {...action.payload, roles: []};
+            }
         }
     },
     extraReducers:(builder => {
@@ -82,9 +90,17 @@ export const accountSlice = createSlice({
             router.navigate('/');
         })
         builder.addMatcher(isAnyOf(signInUser.fulfilled, fetchCurrentUser.fulfilled), (state,action) => {
-            const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
-            const roles = claims['role']
-            state.user = {...action.payload, roles: typeof (roles) === 'string' ? [roles] : roles};
+            try {
+                const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
+                const roles = claims['role'] || [];
+                state.user = {
+                    ...action.payload, 
+                    roles: typeof (roles) === 'string' ? [roles] : (Array.isArray(roles) ? roles : [])
+                };
+            } catch (error) {
+                console.error('Error parsing JWT token:', error);
+                state.user = {...action.payload, roles: []};
+            }
         });
         builder.addMatcher(isAnyOf(signInUser.rejected), (_state, action) => {
             throw action.payload;

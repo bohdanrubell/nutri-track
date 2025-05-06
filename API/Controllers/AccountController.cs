@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using NutriTrack.Entity;
 using NutriTrack.Entity.Enums;
 using NutriTrack.Exceptions;
 using NutriTrack.Services;
+using NutriTrack.Services.Interfaces;
 
 namespace NutriTrack.Controllers;
 
@@ -22,16 +24,54 @@ public class AccountController : ControllerBase
     private readonly TokenService _tokenService;
     private readonly UserManager<User> _userManager;
     private readonly UserService _userService;
+    private readonly IEmailSender _emailSender;
+    private readonly IConfiguration _configuration;
 
     public AccountController(ApplicationDbContext context, UserManager<User> userManager, TokenService tokenService,
-        UserService userService)
+        UserService userService, IEmailSender emailSender, IConfiguration configuration)
     {
         _context = context;
         _userManager = userManager;
         _tokenService = tokenService;
         _userService = userService;
+        _emailSender = emailSender;
+        _configuration = configuration;
     }
 
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return Ok(); // не палимо юзера
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebUtility.UrlEncode(token);
+
+        var callbackUrl = $"{_configuration["FrontendUrl"]}/reset-password?email={dto.Email}&token={encodedToken}";
+        var message = $"<p>Щоб скинути пароль, натисни <a href='{callbackUrl}'>тут</a>.</p>";
+
+        await _emailSender.SendAsync(dto.Email, "Відновлення паролю NutriTrack", message);
+        return Ok("Лист надіслано (якщо email існує)");
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return BadRequest("Користувача не знайдено");
+
+        var decodedToken = WebUtility.UrlDecode(dto.Token);
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        return Ok("Пароль змінено успішно");
+    }
+
+    
     [HttpPost("login")]
     public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
     {
