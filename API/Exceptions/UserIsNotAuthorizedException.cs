@@ -1,6 +1,6 @@
 ﻿namespace NutriTrack.Exceptions;
 
-public class UserIsNotAuthorizedException : ApplicationException
+public class UserIsNotAuthorizedException : AppException
 {
     public UserIsNotAuthorizedException() 
         : base("Користувач не авторизований!") 
