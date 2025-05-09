@@ -64,7 +64,7 @@ function App() {
     if (loading) return <LoadingComponent message="Запускаємо застосунок..." />;
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="uk">
             <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
                 <CssBaseline />
 

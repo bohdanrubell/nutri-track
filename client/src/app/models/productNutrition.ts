@@ -17,7 +17,9 @@ export interface ProductNutritionParams {
 }
 
 export interface ProductNutritionCategory{
+    id: number;
     name: string
+    isDeleteable: boolean;
 }
 
 export default interface ProductRecordNew{

@@ -31,8 +31,7 @@ namespace NutriTrack.Data.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -46,8 +45,7 @@ namespace NutriTrack.Data.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserGender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Height = table.Column<int>(type: "int", nullable: false),
@@ -91,11 +89,51 @@ namespace NutriTrack.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductNutritionCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,7 +142,7 @@ namespace NutriTrack.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -126,7 +164,7 @@ namespace NutriTrack.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -152,7 +190,7 @@ namespace NutriTrack.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -174,7 +212,7 @@ namespace NutriTrack.Data.Migrations
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -191,8 +229,8 @@ namespace NutriTrack.Data.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -215,7 +253,7 @@ namespace NutriTrack.Data.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -238,7 +276,7 @@ namespace NutriTrack.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DateDiaryCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +297,7 @@ namespace NutriTrack.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DateOfRecordCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Weight = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -279,7 +317,7 @@ namespace NutriTrack.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GoalTypeId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -307,10 +345,12 @@ namespace NutriTrack.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductNutritionCategoryId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CaloriesPer100Grams = table.Column<int>(type: "int", nullable: false),
-                    ProteinPer100Grams = table.Column<int>(type: "int", nullable: false),
-                    FatPer100Grams = table.Column<int>(type: "int", nullable: false),
-                    CarbohydratesPer100Grams = table.Column<int>(type: "int", nullable: false)
+                    CaloriesPer100Grams = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    ProteinPer100Grams = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    FatPer100Grams = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    CarbohydratesPer100Grams = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -331,9 +371,9 @@ namespace NutriTrack.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DailyCalories = table.Column<int>(type: "int", nullable: false),
-                    DailyProtein = table.Column<double>(type: "float", nullable: false),
-                    DailyFat = table.Column<double>(type: "float", nullable: false),
-                    DailyCarbohydrates = table.Column<double>(type: "float", nullable: false),
+                    DailyProtein = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    DailyFat = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
+                    DailyCarbohydrates = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
                     DiaryId = table.Column<int>(type: "int", nullable: false),
                     ActivityLogId = table.Column<int>(type: "int", nullable: false),
                     GoalLogId = table.Column<int>(type: "int", nullable: false)
@@ -367,7 +407,7 @@ namespace NutriTrack.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Grams = table.Column<double>(type: "float", nullable: false),
+                    Grams = table.Column<decimal>(type: "decimal(5,1)", nullable: false),
                     ProductNutritionId = table.Column<int>(type: "int", nullable: false),
                     RecordId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -393,46 +433,46 @@ namespace NutriTrack.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, null, "User", "USER" },
-                    { 2, null, "Admin", "ADMIN" }
+                    { new Guid("1becdb31-bd13-49b1-a012-355c0d9a5007"), null, "User", "USER" },
+                    { new Guid("7ba35f34-1e69-45dc-bd15-7193f13f4498"), null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "ProductNutritionCategories",
-                columns: new[] { "Id", "Name" },
+                columns: new[] { "Id", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Фрукти" },
-                    { 2, "Овочі" },
-                    { 3, "Молочні продукти" },
-                    { 4, "М'ясо" }
+                    { 1, false, "Фрукти" },
+                    { 2, false, "Овочі" },
+                    { 3, false, "Молочні продукти" },
+                    { 4, false, "М'ясо" }
                 });
 
             migrationBuilder.InsertData(
                 table: "ProductNutritions",
-                columns: new[] { "Id", "CaloriesPer100Grams", "CarbohydratesPer100Grams", "FatPer100Grams", "Name", "ProductNutritionCategoryId", "ProteinPer100Grams" },
+                columns: new[] { "Id", "CaloriesPer100Grams", "CarbohydratesPer100Grams", "FatPer100Grams", "ImageUrl", "IsDeleted", "Name", "ProductNutritionCategoryId", "ProteinPer100Grams" },
                 values: new object[,]
                 {
-                    { 1, 52, 14, 0, "Яблуко", 1, 0 },
-                    { 2, 96, 23, 0, "Банан", 1, 1 },
-                    { 3, 47, 12, 0, "Апельсин", 1, 1 },
-                    { 4, 32, 8, 0, "Полуниця", 1, 1 },
-                    { 5, 69, 18, 0, "Виноград", 1, 1 },
-                    { 6, 41, 10, 0, "Морковка", 2, 1 },
-                    { 7, 55, 11, 0, "Броколі", 2, 4 },
-                    { 8, 18, 4, 0, "Помідор", 2, 1 },
-                    { 9, 23, 4, 0, "Шпинат", 2, 3 },
-                    { 10, 16, 4, 0, "Огірок", 2, 1 },
-                    { 11, 42, 5, 1, "Молоко", 3, 3 },
-                    { 12, 59, 7, 2, "Йогурт", 3, 3 },
-                    { 13, 402, 1, 33, "Сир", 3, 25 },
-                    { 14, 717, 0, 81, "Масло", 3, 1 },
-                    { 15, 98, 3, 4, "Сир кисломолочий", 3, 11 },
-                    { 16, 165, 0, 4, "Курине філе", 4, 31 },
-                    { 17, 250, 0, 15, "Яловичина", 4, 26 },
-                    { 18, 242, 0, 14, "Свинячий стейк", 4, 27 },
-                    { 19, 189, 0, 7, "Індичка", 4, 29 },
-                    { 20, 294, 0, 21, "Каре ягня", 4, 25 }
+                    { 1, 52m, 14m, 0m, null, false, "Яблуко", 1, 0m },
+                    { 2, 96m, 23m, 0m, null, false, "Банан", 1, 1m },
+                    { 3, 47m, 12m, 0m, null, false, "Апельсин", 1, 1m },
+                    { 4, 32m, 8m, 0m, null, false, "Полуниця", 1, 1m },
+                    { 5, 69m, 18m, 0m, null, false, "Виноград", 1, 1m },
+                    { 6, 41m, 10m, 0m, null, false, "Морковка", 2, 1m },
+                    { 7, 55m, 11m, 0m, null, false, "Броколі", 2, 4m },
+                    { 8, 18m, 4m, 0m, null, false, "Помідор", 2, 1m },
+                    { 9, 23m, 4m, 0m, null, false, "Шпинат", 2, 3m },
+                    { 10, 16m, 4m, 0m, null, false, "Огірок", 2, 1m },
+                    { 11, 42m, 5m, 1m, null, false, "Молоко", 3, 3m },
+                    { 12, 59m, 7m, 2m, null, false, "Йогурт", 3, 3m },
+                    { 13, 402m, 1m, 33m, null, false, "Сир", 3, 25m },
+                    { 14, 717m, 0m, 81m, null, false, "Масло", 3, 1m },
+                    { 15, 98m, 3m, 4m, null, false, "Сир кисломолочий", 3, 11m },
+                    { 16, 165m, 0m, 4m, null, false, "Курине філе", 4, 31m },
+                    { 17, 250m, 0m, 15m, null, false, "Яловичина", 4, 26m },
+                    { 18, 242m, 0m, 14m, null, false, "Свинячий стейк", 4, 27m },
+                    { 19, 189m, 0m, 7m, null, false, "Індичка", 4, 29m },
+                    { 20, 294m, 0m, 21m, null, false, "Каре ягня", 4, 25m }
                 });
 
             migrationBuilder.CreateIndex(
@@ -556,6 +596,12 @@ namespace NutriTrack.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductRecords");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "WeightRecords");

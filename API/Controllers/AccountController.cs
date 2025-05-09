@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Globalization;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using NutriTrack.Entity;
 using NutriTrack.Entity.Enums;
 using NutriTrack.Exceptions;
 using NutriTrack.Services;
+using NutriTrack.Services.Interfaces;
 
 namespace NutriTrack.Controllers;
 
@@ -21,26 +24,67 @@ public class AccountController : ControllerBase
     private readonly TokenService _tokenService;
     private readonly UserManager<User> _userManager;
     private readonly UserService _userService;
+    private readonly IEmailSender _emailSender;
+    private readonly IConfiguration _configuration;
 
     public AccountController(ApplicationDbContext context, UserManager<User> userManager, TokenService tokenService,
-        UserService userService)
+        UserService userService, IEmailSender emailSender, IConfiguration configuration)
     {
         _context = context;
         _userManager = userManager;
         _tokenService = tokenService;
         _userService = userService;
+        _emailSender = emailSender;
+        _configuration = configuration;
     }
 
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return Ok(); // не палимо юзера
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebUtility.UrlEncode(token);
+
+        var callbackUrl = $"{_configuration["FrontendUrl"]}/reset-password?email={dto.Email}&token={encodedToken}";
+        var message = $"<p>Щоб скинути пароль, натисни <a href='{callbackUrl}'>тут</a>.</p>";
+
+        await _emailSender.SendAsync(dto.Email, "Відновлення паролю NutriTrack", message);
+        return Ok("Лист надіслано (якщо email існує)");
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return BadRequest("Користувача не знайдено");
+
+        /*var decodedToken = WebUtility.UrlDecode(dto.Token);*/
+        var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        return Ok("Пароль змінено успішно");
+    }
+
+    
     [HttpPost("login")]
     public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
     {
         var user = await _userManager.FindByNameAsync(loginRequest.Username);
+        
         if (user is null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
-            return Unauthorized();
-
+        {
+            throw new UserIsNotAuthorizedException();
+        }
+        
         return new UserResponse
         {
-            Id = user.Id,
+            Id = user.Id.ToString(),
             Username = user.UserName!,
             Token = await _tokenService.GenerateToken(user)
         };
@@ -103,71 +147,59 @@ public class AccountController : ControllerBase
     [HttpGet("profile")]
     public async Task<ActionResult<UserCharacteristicsResponse>> GetCurrentUserCharacteristics()
     {
-        try
-        {
-            var user = await _userService.GetUserAsync();
+        var user = await _userService.GetUserAsync();
 
-            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+        var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
 
-            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+        var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
 
-            var usersWeightRecords = await _context.WeightRecords
-                .Include(w => w.User)
-                .Where(w => w.User.Id == user.Id)
-                .OrderByDescending(w => w.DateOfRecordCreated)
-                .Select(w => new WeightRecordResponse
-                {
-                    Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
-                    Weight = w.Weight
-                })
-                .ToListAsync();
-
-            var latestWeightRecord = usersWeightRecords.First();
-
-            var age = DateTime.Now.Year - user.DateOfBirth.Year;
-
-            if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
-
-            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
-                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
-
-            var dailyNutritionsResponse = new DailyNutritionsResponse
+        var usersWeightRecords = await _context.WeightRecords
+            .Include(w => w.User)
+            .Where(w => w.User.Id == user.Id)
+            .OrderByDescending(w => w.DateOfRecordCreated)
+            .Select(w => new WeightRecordResponse
             {
-                DailyCalories = calculator.CalculateDailyCalories(),
-                DailyProtein = calculator.CalculateDailyProtein(),
-                DailyFat = calculator.CalculateDailyFat(),
-                DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
-            };
+                Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
+                Weight = w.Weight
+            })
+            .ToListAsync();
 
-            var userCharResponse = new UserCharacteristicsResponse
-            {
-                Gender = user.UserGender.ToString(),
-                DateOfBirth = user.DateOfBirth.ToString("dd/MM/yyyy"),
-                Age = age,
-                Height = user.Height,
-                CurrentGoalType = userCurrentGoalType.Goal.Name,
-                CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
-                DailyNutritions = dailyNutritionsResponse,
-                WeightRecords = usersWeightRecords
-            };
-            return Ok(userCharResponse);
-        }
-        catch (UserIsNotAuthorizedException exception)
+        var latestWeightRecord = usersWeightRecords.First();
+
+        var age = DateTime.Now.Year - user.DateOfBirth.Year;
+
+        if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
+
+        var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
+            userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+
+        var dailyNutritionsResponse = new DailyNutritionsResponse
         {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
+            DailyCalories = calculator.CalculateDailyCalories(),
+            DailyProtein = calculator.CalculateDailyProtein(),
+            DailyFat = calculator.CalculateDailyFat(),
+            DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
+        };
+
+        var userCharResponse = new UserCharacteristicsResponse
         {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
+            Gender = user.UserGender.ToString(),
+            DateOfBirth = user.DateOfBirth.ToString("dd MMMM yyyy", new CultureInfo("uk-UA"))
+            ,
+            Age = age,
+            Height = user.Height,
+            CurrentGoalType = userCurrentGoalType.Goal.Name,
+            CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
+            DailyNutritions = dailyNutritionsResponse,
+            WeightRecords = usersWeightRecords
+        };
+        return Ok(userCharResponse);
     }
     
     [HttpPut("profile")]
     public async Task<ActionResult> UpdateUserProfile(UpdateUserProfileRequest request, TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
-        try
-        {
             var user = await _userService.GetUserAsync();
 
             await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -191,12 +223,14 @@ public class AccountController : ControllerBase
             {
                 var newActivityLevelLog = ActivityLevelLog.Create(timeProvider, activityLevel, user);
                 await _context.ActivityLevelLogs.AddAsync(newActivityLevelLog, cancellationToken);
+                userCurrentActivityLevel = newActivityLevelLog;
             }
 
             if (userCurrentGoalType.Goal.Name != request.CurrentGoalType)
             {
                 var initialGoalTypeLog = GoalTypeLog.Create(timeProvider, goal, user);
                 await _context.GoalTypeLogs.AddAsync(initialGoalTypeLog, cancellationToken);
+                userCurrentGoalType = initialGoalTypeLog;
             }
             
             await _userManager.UpdateAsync(user);
@@ -224,23 +258,13 @@ public class AccountController : ControllerBase
             await transaction.CommitAsync(cancellationToken);
 
             return NoContent();
-        }
-        catch (UserIsNotAuthorizedException exception)
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
     }
     
     [HttpPost("addWeightRecord")]
     public async Task<ActionResult> AddNewWeightRecord(TimeProvider timeProvider, WeightRecordRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
+        
             var user = await _userService.GetUserAsync();
 
             var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
@@ -269,39 +293,19 @@ public class AccountController : ControllerBase
             await _context.SaveChangesAsync(cancellationToken);
 
             return NoContent();
-        }
-        catch (UserIsNotAuthorizedException exception)
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
     }
     
     [HttpGet("currentUser")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
-        try
-        {
-            var user = await _userService.GetUserAsync();
+        var user = await _userService.GetUserAsync();
 
-            return new UserResponse
-            {
-                Id = user.Id,
-                Username = user.UserName!,
-                Token = await _tokenService.GenerateToken(user)
-            };
-        }
-        catch (UserIsNotAuthorizedException exception)
+        return new UserResponse
         {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
+            Id = user.Id.ToString(),
+            Username = user.UserName!,
+            Token = await _tokenService.GenerateToken(user)
+        };
     }
 
     [HttpGet("activityLevels")]

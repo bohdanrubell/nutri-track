@@ -3,7 +3,7 @@
 public class ProductRecord
 {
     public int Id { get; set; }
-    public double Grams { get; set; }
+    public decimal Grams { get; set; }
     
     public int ProductNutritionId { get; set; }
     public ProductNutrition ProductNutrition { get; set; }
@@ -12,11 +12,11 @@ public class ProductRecord
     public Record Record { get; set; }
 
 
-    public static ProductRecord Create(Record record, ProductNutrition productNutrition, double grams)
+    public static ProductRecord Create(Record record, ProductNutrition productNutrition, decimal grams)
     {
         var productRecord = new ProductRecord
         {
-            Grams = Math.Round(grams, 2),
+            Grams = grams,
             ProductNutrition = productNutrition,
             Record = record
         };

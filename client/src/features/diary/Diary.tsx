@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid2';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from 'dayjs';
+import 'dayjs/locale/uk';
 import { DateCalendar } from "@mui/x-date-pickers";
 import ProductRecordForm, { DailyRecord } from "../../app/models/dailyRecord.ts";
 import apiClient from "../../app/axios/apiClient.ts";
@@ -100,7 +101,7 @@ export default function Diary() {
             </Grid>
             <Grid>
                 <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
-                    Запис щоденника за {selectedDate.format('DD.MM.YYYY')}
+                    Запис щоденника за {selectedDate.format('D MMMM YYYY')}
                 </Typography>
 
                 <Grid container justifyContent="center" mb={2}>

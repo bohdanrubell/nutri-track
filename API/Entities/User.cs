@@ -4,7 +4,7 @@ using NutriTrack.Entity.Enums;
 
 namespace NutriTrack.Entities;
 
-public class User : IdentityUser<int>
+public class User : IdentityUser<Guid>
 {
     public Gender UserGender { get; set; }
     public DateTime DateOfBirth { get; set; }

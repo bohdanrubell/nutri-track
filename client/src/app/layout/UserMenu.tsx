@@ -69,7 +69,7 @@ export default function UserMenu() {
                 open={open}
                 onClose={handleClose}
             >
-                {user!.roles!.includes('User') && <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                {user && user.roles && user.roles.includes('User') && <MenuItem component={Link} to="/profile" onClick={handleClose}>
                     Профіль користувача
                 </MenuItem>}
 

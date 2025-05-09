@@ -11,45 +11,42 @@ public class CaloriesCalc(Gender gender, int age, int height, int weight, Activi
     private ActivityLevel Activity { get; set; } = activityLevel;
     private GoalType Goal { get; set; } = goalType;
 
-    private double CalculateBmr()
+    private decimal CalculateBmr()
     {
         if (UserGender == Gender.Male)
         {
-            return 10 * Weight + 6.25 * Height - 5 * Age + 5;
+            return 10m * Weight + 6.25m * Height - 5m * Age + 5m;
         }
         else
         {
-            return 10 * Weight + 6.25 * Height - 5 * Age - 161;
+            return 10m * Weight + 6.25m * Height - 5m * Age - 161m;
         }
     }
 
     public int CalculateDailyCalories()
     {
-        var activityMultiplier = (double)Activity.Ratio / 1000;
-        var interestDependFromGoal = (double)Goal.Percent / 100;
+        var activityMultiplier = Activity.Ratio / 1000m;
+        var goalModifier = Goal.Percent / 100m;
         var bmr = CalculateBmr();
-        
-        return (int)(bmr * activityMultiplier * interestDependFromGoal);
+
+        return (int)(bmr * activityMultiplier * goalModifier);
     }
 
-    public double CalculateDailyProtein()
+    public decimal CalculateDailyProtein()
     {
         var calories = CalculateDailyCalories();
-        
-        return Math.Round(calories * 0.20 / 4, 2);
+        return Math.Round(calories * 0.20m / 4m, 1);
     }
-    
-    public double CalculateDailyFat()
+
+    public decimal CalculateDailyFat()
     {
         var calories = CalculateDailyCalories();
-        
-        return Math.Round(calories * 0.25 / 9, 2);
+        return Math.Round(calories * 0.25m / 9m, 1);
     }
-    
-    public double CalculateDailyCarbohydrates()
+
+    public decimal CalculateDailyCarbohydrates()
     {
         var calories = CalculateDailyCalories();
-        
-        return Math.Round(calories * 0.55 / 4, 2);
+        return Math.Round(calories * 0.55m / 4m, 1);
     }
 }

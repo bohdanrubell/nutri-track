@@ -3,5 +3,5 @@
 public class ProductRecordUpdateRequest
 {
     public int ProductRecordId { get; set; }
-    public double ConsumedGrams { get; set; }
+    public decimal ConsumedGrams { get; set; }
 }

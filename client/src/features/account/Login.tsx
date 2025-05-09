@@ -22,7 +22,16 @@ export default function Login() {
 
     async function submitForm(data: FieldValues) {
         await dispatch(signInUser(data));
-        navigate(location.state?.from || '/productNutrition');
+
+        const fromPath = location.state?.from?.pathname;
+        const fallbackPath = '/productNutrition';
+
+        const safeRedirect =
+            fromPath && ['/diary', '/profile', '/statistics'].includes(fromPath)
+                ? fallbackPath
+                : fromPath || fallbackPath;
+
+        navigate(safeRedirect, { replace: true });
     }
 
     return (
@@ -59,16 +68,22 @@ export default function Login() {
                     Авторизуватись
                 </LoadingButton>
                 <Grid container
-                      direction="row"
+                      direction="column"
                       sx={{
                           justifyContent: "center",
                           alignItems: "center",
+                          gap: 1
                       }}
                 >
                     <Grid>
-                        <Link to='/register'>
+                        <Link to='/register' style={{ color: 'inherit', textDecoration: 'none' }}>
                             {"Немає аккаунту? Зареєструйтесь!"}
                         </Link>
+                    </Grid>
+                    <Grid>
+                    <Link to='/forgot-password' style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {"Забули пароль?"}
+                    </Link>
                     </Grid>
                 </Grid>
             </Box>

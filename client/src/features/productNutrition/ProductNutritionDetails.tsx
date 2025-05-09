@@ -13,7 +13,7 @@ import Grid from "@mui/material/Grid2";
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAppDispatch, useAppSelector} from '../../app/store/store.ts';
 import {useEffect, useState} from "react";
-import {fetchProductAsync, productNutritionSelectors, removeProduct} from "./productNutritionSlice.ts";
+import {fetchCategories, fetchProductAsync, productNutritionSelectors, removeProduct} from "./productNutritionSlice.ts";
 import LoadingComponent from "../../app/components/LoadingComponent.tsx";
 import apiClient from "../../app/axios/apiClient.ts";
 import {toast} from "react-toastify";
@@ -58,6 +58,7 @@ export default function ProductNutritionDetails() {
             await apiClient.Admin.deleteProductNutrition(productNutrition.id);
             setDeleteMode(false);
             dispatch(removeProduct(productNutrition))
+            dispatch(fetchCategories())
             toast.success(`Продукт ${productNutrition.name} успішно видалений із бази даних!`)
         } catch {
             toast.error("Помилка при видалені продукту із бази даних!");

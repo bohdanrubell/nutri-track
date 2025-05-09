@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Entities;
 using NutriTrack.Entity;
 
 namespace NutriTrack.Data;
 
-public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<User, Role, int>(options)
+public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<User, Role, Guid>(options)
 {
     public DbSet<WeightRecord> WeightRecords { get; set; }
     public DbSet<GoalType> GoalTypes { get; set; }
@@ -21,11 +22,42 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        
+        builder.Entity<IdentityUser>(b =>
+        {
+            b.ToTable("Users");
+        });
+
+        builder.Entity<IdentityRole>(b =>
+        {
+            b.ToTable("Roles");
+        });
 
         builder.Entity<User>()
             .Property(u => u.UserGender)
             .HasConversion<string>();
 
+        builder.Entity<ProductNutrition>(e =>
+        {
+            e.Property(p => p.CaloriesPer100Grams).HasColumnType("decimal(5,1)");
+            e.Property(p => p.ProteinPer100Grams).HasColumnType("decimal(5,1)");
+            e.Property(p => p.FatPer100Grams).HasColumnType("decimal(5,1)");
+            e.Property(p => p.CarbohydratesPer100Grams).HasColumnType("decimal(5,1)");
+        });
+
+        builder.Entity<ProductRecord>(e =>
+        {
+            e.Property(p => p.Grams).HasColumnType("decimal(5,1)");
+        });
+
+        builder.Entity<Record>(e =>
+        {
+            e.Property(r => r.DailyProtein).HasColumnType("decimal(5,1)");
+            e.Property(r => r.DailyFat).HasColumnType("decimal(5,1)");
+            e.Property(r => r.DailyCarbohydrates).HasColumnType("decimal(5,1)");
+        });
+
+        
         builder.Entity<WeightRecord>()
             .HasOne(wr => wr.User)
             .WithMany(u => u.WeightRecords)
@@ -33,8 +65,8 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
 
         builder.Entity<Role>()
             .HasData(
-                new Role { Id = 1, Name = "User", NormalizedName = "USER" },
-                new Role { Id = 2, Name = "Admin", NormalizedName = "ADMIN" }
+                new Role { Id = Guid.NewGuid(), Name = "User", NormalizedName = "USER" },
+                new Role { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN" }
             );
 
         builder.Entity<ProductNutritionCategory>()

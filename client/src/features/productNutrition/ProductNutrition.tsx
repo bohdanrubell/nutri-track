@@ -17,6 +17,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import CategoryIcon from '@mui/icons-material/Category';
 import MenuIcon from '@mui/icons-material/Menu';
 import Typography from "@mui/material/Typography";
+import ProductCategoryManagement from "./ProductCategoryManagement.tsx";
 
 const sortOptions = [
     { value: 'name', label: 'Від А до Я' },
@@ -26,23 +27,34 @@ const sortOptions = [
 
 export default function ProductNutrition() {
     const {user} = useAppSelector(state => state.account)
-    const {products, categoriesLoaded, categories, metaData} = useProductsNutrition();
+    const {products, productsLoaded ,categories, metaData} = useProductsNutrition();
     const { productParams } = useAppSelector(state => state.productNutrition);
     const [createMode, setCreateMode] = useState(false);
     const dispatch = useAppDispatch();
+    const [categoryManagementMode, setCategoryManagementMode] = useState(false);
+
 
     function cancelCreate() {
         setCreateMode(false);
+    }
+
+    function cancelCategoryManagement() {
+        setCategoryManagementMode(false);
     }
 
     if (createMode && (!user?.roles?.includes('Admin'))) {
         setCreateMode(false);
     }
 
+    if (categoryManagementMode && (!user?.roles?.includes('Admin'))) {
+        setCategoryManagementMode(false);
+    }
+
     if (createMode) return <ProductNutritionForm cancelCreate={cancelCreate}/>
+    if (categoryManagementMode) return <ProductCategoryManagement onClose={cancelCategoryManagement}/>;
 
 
-    if (!categoriesLoaded) return <LoadingComponent message='Завантаження продуктів...' />
+    if (!productsLoaded) return <LoadingComponent message='Завантаження продуктів...' />
 
     return (
         <>
@@ -95,7 +107,7 @@ export default function ProductNutrition() {
                     <SpeedDialAction
                         icon={<CategoryIcon />}
                         tooltipTitle="Керування категоріями"
-                        onClick={() => console.log("Керування категоріями")}
+                        onClick={() => setCategoryManagementMode(true)}
                     />
                 </SpeedDial>
             )}
