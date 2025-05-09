@@ -4,7 +4,7 @@ import {FieldValues, useForm} from "react-hook-form";
 import InputComponent from "../../app/components/InputComponent.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useAppDispatch} from "../../app/store/store.ts";
-import {fetchProductAsync, setProduct} from "./productNutritionSlice.ts";
+import {fetchCategories, fetchProductAsync, setProduct} from "./productNutritionSlice.ts";
 import {LoadingButton} from "@mui/lab";
 import {ProductNutrition} from "../../app/models/productNutrition.ts";
 import {validationSchema} from "./productNutritionValidation.ts";
@@ -91,6 +91,7 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
 
             dispatch(setProduct(response));
             dispatch(fetchProductAsync(response.id))
+            dispatch(fetchCategories())
             cancelCreate();
         } catch (error) {
             console.log(error);

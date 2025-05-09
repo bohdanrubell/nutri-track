@@ -22,6 +22,25 @@ namespace NutriTrack.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -44,6 +63,58 @@ namespace NutriTrack.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -142,7 +213,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityLevels", (string)null);
+                    b.ToTable("ActivityLevels");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.ActivityLevelLog", b =>
@@ -168,7 +239,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ActivityLevelLogs", (string)null);
+                    b.ToTable("ActivityLevelLogs");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.Diary", b =>
@@ -190,7 +261,7 @@ namespace NutriTrack.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Diaries", (string)null);
+                    b.ToTable("Diaries");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.GoalType", b =>
@@ -210,7 +281,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GoalTypes", (string)null);
+                    b.ToTable("GoalTypes");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.GoalTypeLog", b =>
@@ -236,7 +307,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GoalTypeLogs", (string)null);
+                    b.ToTable("GoalTypeLogs");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.ProductNutrition", b =>
@@ -276,7 +347,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("ProductNutritionCategoryId");
 
-                    b.ToTable("ProductNutritions", (string)null);
+                    b.ToTable("ProductNutritions");
 
                     b.HasData(
                         new
@@ -518,7 +589,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductNutritionCategories", (string)null);
+                    b.ToTable("ProductNutritionCategories");
 
                     b.HasData(
                         new
@@ -570,7 +641,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("RecordId");
 
-                    b.ToTable("ProductRecords", (string)null);
+                    b.ToTable("ProductRecords");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.Record", b =>
@@ -613,7 +684,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("GoalLogId");
 
-                    b.ToTable("Records", (string)null);
+                    b.ToTable("Records");
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.User", b =>
@@ -713,7 +784,7 @@ namespace NutriTrack.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WeightRecords", (string)null);
+                    b.ToTable("WeightRecords");
                 });
 
             modelBuilder.Entity("NutriTrack.Entity.Role", b =>
@@ -746,13 +817,13 @@ namespace NutriTrack.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("990226bd-1bd9-4217-8d91-38af2cd4c1d5"),
+                            Id = new Guid("1becdb31-bd13-49b1-a012-355c0d9a5007"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("a769d765-23f0-487d-9ed8-2b1ecd2b551e"),
+                            Id = new Guid("7ba35f34-1e69-45dc-bd15-7193f13f4498"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

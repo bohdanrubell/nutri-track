@@ -36,4 +36,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+    </ItemGroup>
+
 </Project>

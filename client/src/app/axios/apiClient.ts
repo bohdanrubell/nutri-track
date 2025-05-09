@@ -19,39 +19,74 @@ axios.interceptors.request.use(config => {
     return config;
 })
 
+
 axios.interceptors.response.use(async response => {
     const pagination = response.headers['pagination'];
     if (pagination) {
         response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
         return response;
     }
-    return response
+    return response;
 }, (error: AxiosError) => {
-    const {data, status} = error.response as AxiosResponse;
+
+    const {data, status} = error.response!;
+
+    interface ErrorData {
+        title?: string;
+        errors?: string[] | Record<string, string[]>;
+        type?: string;
+        status?: number;
+        detail?: string;
+    }
+
+    const errorData = data as ErrorData;
+
     switch (status) {
         case 400:
-            if (data.errors) {
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                errorData.errors.forEach(error => {
+                    toast.error(error);
+                });
+            }
+            else if (errorData.errors && typeof errorData.errors === 'object') {
                 const modelStateErrors: string[] = [];
-                for (const key in data.errors) {
-                    if (data.errors[key]) {
-                        modelStateErrors.push(data.errors[key])
+                for (const key in errorData.errors) {
+                    if (errorData.errors[key]) {
+                        const keyErrors = errorData.errors[key];
+                        if (Array.isArray(keyErrors)) {
+                            modelStateErrors.push(keyErrors.join(', '));
+                        }
                     }
                 }
-                throw modelStateErrors.flat();
+                modelStateErrors.forEach(error => {
+                    toast.error(error);
+                });
             }
-            toast.error(data.title);
+            else {
+                toast.error(errorData.title || 'Помилка запиту');
+            }
             break;
         case 401:
-            toast.error("Невдалий вхід. Будь ласка, переіерте введені дані.");
+            toast.error(errorData.title || "Потрібна авторизація. Будь ласка, увійдіть.");
             break;
         case 403:
-            toast.error('Заборонена дія!');
+            toast.error(errorData.title || 'Доступ заборонено!');
+            break;
+        case 404:
+            if (!error.config?.url?.includes('diary/getRecordByDate')) {
+                toast.error(errorData.title || 'Ресурс не знайдено');
+            }
+            break;
+        case 500:
+            toast.error(errorData.title || 'Серверна помилка');
             break;
         default:
+            toast.error(errorData.title || 'Щось пішло не так');
             break;
     }
+
     return Promise.reject(error.response);
-})
+});
 
 const requests = {
     get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(responseBody),

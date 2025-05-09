@@ -12,7 +12,7 @@ using NutriTrack.Data;
 namespace NutriTrack.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250504183950_Initial")]
+    [Migration("20250509193228_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,6 +24,25 @@ namespace NutriTrack.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles", (string)null);
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -47,6 +66,58 @@ namespace NutriTrack.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -262,6 +333,9 @@ namespace NutriTrack.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -285,6 +359,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 52m,
                             CarbohydratesPer100Grams = 14m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Яблуко",
                             ProductNutritionCategoryId = 1,
                             ProteinPer100Grams = 0m
@@ -295,6 +370,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 96m,
                             CarbohydratesPer100Grams = 23m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Банан",
                             ProductNutritionCategoryId = 1,
                             ProteinPer100Grams = 1m
@@ -305,6 +381,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 47m,
                             CarbohydratesPer100Grams = 12m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Апельсин",
                             ProductNutritionCategoryId = 1,
                             ProteinPer100Grams = 1m
@@ -315,6 +392,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 32m,
                             CarbohydratesPer100Grams = 8m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Полуниця",
                             ProductNutritionCategoryId = 1,
                             ProteinPer100Grams = 1m
@@ -325,6 +403,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 69m,
                             CarbohydratesPer100Grams = 18m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Виноград",
                             ProductNutritionCategoryId = 1,
                             ProteinPer100Grams = 1m
@@ -335,6 +414,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 41m,
                             CarbohydratesPer100Grams = 10m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Морковка",
                             ProductNutritionCategoryId = 2,
                             ProteinPer100Grams = 1m
@@ -345,6 +425,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 55m,
                             CarbohydratesPer100Grams = 11m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Броколі",
                             ProductNutritionCategoryId = 2,
                             ProteinPer100Grams = 4m
@@ -355,6 +436,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 18m,
                             CarbohydratesPer100Grams = 4m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Помідор",
                             ProductNutritionCategoryId = 2,
                             ProteinPer100Grams = 1m
@@ -365,6 +447,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 23m,
                             CarbohydratesPer100Grams = 4m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Шпинат",
                             ProductNutritionCategoryId = 2,
                             ProteinPer100Grams = 3m
@@ -375,6 +458,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 16m,
                             CarbohydratesPer100Grams = 4m,
                             FatPer100Grams = 0m,
+                            IsDeleted = false,
                             Name = "Огірок",
                             ProductNutritionCategoryId = 2,
                             ProteinPer100Grams = 1m
@@ -385,6 +469,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 42m,
                             CarbohydratesPer100Grams = 5m,
                             FatPer100Grams = 1m,
+                            IsDeleted = false,
                             Name = "Молоко",
                             ProductNutritionCategoryId = 3,
                             ProteinPer100Grams = 3m
@@ -395,6 +480,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 59m,
                             CarbohydratesPer100Grams = 7m,
                             FatPer100Grams = 2m,
+                            IsDeleted = false,
                             Name = "Йогурт",
                             ProductNutritionCategoryId = 3,
                             ProteinPer100Grams = 3m
@@ -405,6 +491,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 402m,
                             CarbohydratesPer100Grams = 1m,
                             FatPer100Grams = 33m,
+                            IsDeleted = false,
                             Name = "Сир",
                             ProductNutritionCategoryId = 3,
                             ProteinPer100Grams = 25m
@@ -415,6 +502,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 717m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 81m,
+                            IsDeleted = false,
                             Name = "Масло",
                             ProductNutritionCategoryId = 3,
                             ProteinPer100Grams = 1m
@@ -425,6 +513,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 98m,
                             CarbohydratesPer100Grams = 3m,
                             FatPer100Grams = 4m,
+                            IsDeleted = false,
                             Name = "Сир кисломолочий",
                             ProductNutritionCategoryId = 3,
                             ProteinPer100Grams = 11m
@@ -435,6 +524,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 165m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 4m,
+                            IsDeleted = false,
                             Name = "Курине філе",
                             ProductNutritionCategoryId = 4,
                             ProteinPer100Grams = 31m
@@ -445,6 +535,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 250m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 15m,
+                            IsDeleted = false,
                             Name = "Яловичина",
                             ProductNutritionCategoryId = 4,
                             ProteinPer100Grams = 26m
@@ -455,6 +546,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 242m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 14m,
+                            IsDeleted = false,
                             Name = "Свинячий стейк",
                             ProductNutritionCategoryId = 4,
                             ProteinPer100Grams = 27m
@@ -465,6 +557,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 189m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 7m,
+                            IsDeleted = false,
                             Name = "Індичка",
                             ProductNutritionCategoryId = 4,
                             ProteinPer100Grams = 29m
@@ -475,6 +568,7 @@ namespace NutriTrack.Data.Migrations
                             CaloriesPer100Grams = 294m,
                             CarbohydratesPer100Grams = 0m,
                             FatPer100Grams = 21m,
+                            IsDeleted = false,
                             Name = "Каре ягня",
                             ProductNutritionCategoryId = 4,
                             ProteinPer100Grams = 25m
@@ -489,6 +583,9 @@ namespace NutriTrack.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -501,21 +598,25 @@ namespace NutriTrack.Data.Migrations
                         new
                         {
                             Id = 1,
+                            IsDeleted = false,
                             Name = "Фрукти"
                         },
                         new
                         {
                             Id = 2,
+                            IsDeleted = false,
                             Name = "Овочі"
                         },
                         new
                         {
                             Id = 3,
+                            IsDeleted = false,
                             Name = "Молочні продукти"
                         },
                         new
                         {
                             Id = 4,
+                            IsDeleted = false,
                             Name = "М'ясо"
                         });
                 });
@@ -719,13 +820,13 @@ namespace NutriTrack.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5bdbe729-35c1-472e-8545-043e6858a015"),
+                            Id = new Guid("1becdb31-bd13-49b1-a012-355c0d9a5007"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("08db6955-79e7-470b-8c18-bafa9fc8deea"),
+                            Id = new Guid("7ba35f34-1e69-45dc-bd15-7193f13f4498"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

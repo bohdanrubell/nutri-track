@@ -11,7 +11,7 @@ import {
     Divider,
     MenuItem,
     Stack,
-    TextField,
+    TextField, Tooltip,
     Typography
 } from '@mui/material';
 import Grid from "@mui/material/Grid2"
@@ -20,6 +20,7 @@ import apiClient from "../../app/axios/apiClient.ts";
 import {ActivityLevel, GoalType, ProfileFormData, UserCharacteristics} from "../../app/models/profileHelpers.ts";
 import {toast} from "react-toastify";
 import LoadingComponent from "../../app/components/LoadingComponent.tsx";
+import dayjs from "dayjs";
 
 interface WeightRecord {
     weight: number;
@@ -49,6 +50,12 @@ export default function Profile() {
         apiClient.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
     }, [dataUpdated]);
 
+    const hasWeightRecordForToday = (): boolean => {
+        if (!userData) return false;
+        const today = dayjs().format('DD-MM-YYYY');
+        return userData.weightRecords.some(record => record.date === today);
+    };
+
     useEffect(() => {
         if (userData) {
             setEditedData({
@@ -60,6 +67,8 @@ export default function Profile() {
         }
     }, [userData]);
 
+    console.log(userData)
+
     const handleAddWeightClick = () => setOpenWeightDialog(true);
     const handleEditProfileClick = () => setOpenEditDialog(true);
     const handleCloseWeightDialog = () => setOpenWeightDialog(false);
@@ -67,6 +76,14 @@ export default function Profile() {
 
     const handleSaveWeight = () => {
         if (!isNaN(newWeight.weight) && newWeight.weight > 0) {
+
+            if (hasWeightRecordForToday()) {
+                toast.error("Ви вже додали запис ваги на сьогодні.");
+                setOpenWeightDialog(false);
+                setNewWeight({weight: 0, date: ''});
+                return;
+            }
+
             apiClient.Account.addNewWeightRecord({weight: newWeight.weight})
                 .then(() => {
                     toast.success("Успішно додано новий запис ваги!");
@@ -164,9 +181,19 @@ export default function Profile() {
                                     )}
                             </Box>
 
-                            <Button variant="contained" color="secondary" sx={{mt: 2}} onClick={handleAddWeightClick}>
-                                Додати новий запис ваги
-                            </Button>
+                            <Tooltip title={hasWeightRecordForToday ? "Ви вже додали запис ваги на сьогодні" : "Додати новий запис ваги"}>
+                                <span>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{mt: 2}}
+                                        onClick={handleAddWeightClick}
+                                        disabled={hasWeightRecordForToday}
+                                    >
+                                        Додати новий запис ваги
+                                    </Button>
+                                </span>
+                            </Tooltip>
                         </CardContent>
                     </Card>
                 </Grid>

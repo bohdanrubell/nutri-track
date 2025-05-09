@@ -34,29 +34,11 @@ export default function ResetPassword() {
 
     async function submitForm(data: FieldValues) {
         try {
-            console.log("Email:", email);
-            console.log("Token (from URL):", encodedToken);
-            console.log("New Password:", data.newPassword);
-            
             await apiClient.Account.resetPassword(email, encodedToken, data.newPassword);
             setResetSuccess(true);
             toast.success("Пароль успішно змінено");
         } catch (error) {
             console.error("Error resetting password:", error);
-            
-            // More detailed error handling
-            if (error.response && error.response.data) {
-                console.error("Server error details:", error.response.data);
-                
-                // If the error contains specific validation errors
-                if (error.response.data.errors) {
-                    toast.error("Помилка валідації: " + JSON.stringify(error.response.data.errors));
-                } else {
-                    toast.error("Помилка сервера: " + JSON.stringify(error.response.data));
-                }
-            } else {
-                toast.error("Помилка при зміні паролю. Можливо, посилання недійсне або термін його дії закінчився.");
-            }
         }
     }
 
