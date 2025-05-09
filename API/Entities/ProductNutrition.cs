@@ -10,6 +10,8 @@ public class ProductNutrition
     public decimal FatPer100Grams { get; set; }
     public decimal CarbohydratesPer100Grams { get; set; }
 
+    public bool IsDeleted { get; set; }
+    
     public string? ImageUrl { get; set; }
 
     public ProductNutritionCategory ProductNutritionCategory { get; set; }

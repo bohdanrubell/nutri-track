@@ -54,6 +54,7 @@ public class ProductNutritionController : ControllerBase
     {
         var query = _context.ProductNutritions
             .Include(p => p.ProductNutritionCategory)
+            .Where(p => p.IsDeleted == false)
             .Sort(productNutritionParams.OrderBy)
             .Search(productNutritionParams.SearchTerm)
             .FilterByCategories(productNutritionParams.ProductNutritionCategory)
@@ -84,6 +85,7 @@ public class ProductNutritionController : ControllerBase
     {
         var products = await _context.ProductNutritions
             .Include(p => p.ProductNutritionCategory)
+            .Where(p => p.IsDeleted == false)
             .OrderBy(p => p.Name)
             .ToListAsync();
 
@@ -200,39 +202,56 @@ public class ProductNutritionController : ControllerBase
 
         if (product == null) return NotFound();
 
-        if (!string.IsNullOrEmpty(product.ImageUrl))
+        /*if (!string.IsNullOrEmpty(product.ImageUrl))
         {
             await _imageService.DeleteImageAsync(product.ImageUrl);
-        }
-        
-        _context.ProductNutritions.Remove(product);
+        }*/
+
+        product.IsDeleted = true;
 
         var result = await _context.SaveChangesAsync() > 0;
 
         if (result) return Ok();
 
-        return BadRequest("Problem deleting the product");
+        return BadRequest("Виникла проблема при видаленні продукту!");
     }
     
     [HttpGet("categories")]
     public async Task<ActionResult<List<ProductCategoryResponse>>> GetProductNutritionCategories()
     {
-        return await _context.ProductNutritionCategories
-            .Select(p => new ProductCategoryResponse
+        var categories = await _context.ProductNutritionCategories
+            .Where(c => !c.IsDeleted)
+            .Select(c => new ProductCategoryResponse
             {
-                Name = p.Name
+                Id = c.Id,
+                Name = c.Name,
+                IsDeleteable = c.ProductNutritions.All(p => p.IsDeleted)
             })
             .ToListAsync();
+
+        return categories;
     }
+
 
     [Authorize(Roles = "Admin")]
     [HttpPost("category/add")]
     public async Task<ActionResult> AddNewProductNutritionCategory([FromBody] CreateProductCategoryRequest request)
     {
-        var isCategoryExist = await _context.ProductNutritionCategories.AnyAsync(c => c.Name == request.CategoryName);
+        var category = await _context.ProductNutritionCategories
+            .FirstOrDefaultAsync(c => c.Name == request.CategoryName);
+        
+        if (category != null)
+        {
+            if (!category.IsDeleted)
+            {
+                throw new ValidationException($"Категорія з назвою '{request.CategoryName}' вже існує в базі даних!");
+            }
 
-        if (isCategoryExist) return Conflict($"Категорія з назвою {request.CategoryName} існує в базі даних!");
-
+            category.IsDeleted = false;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        
         var newCategory = new ProductNutritionCategory
         {
             Name = request.CategoryName
@@ -250,9 +269,13 @@ public class ProductNutritionController : ControllerBase
     {
         var category = await _context.ProductNutritionCategories.FirstOrDefaultAsync(c => c.Id == id);
 
-        if (category is null) return NotFound($"Категорія під ідентифікатором {id} не існує у базі даних! ");
+        if (category is null || category.IsDeleted)
+        {
+            return NotFound($"Категорія під ідентифікатором {id} не існує у базі даних! ");
+        }
         
-        _context.ProductNutritionCategories.Remove(category);
+        category.IsDeleted = true;
+        
         await _context.SaveChangesAsync();
         
         return NoContent();

@@ -62,8 +62,8 @@ public class AccountController : ControllerBase
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user == null) return BadRequest("Користувача не знайдено");
 
-        var decodedToken = WebUtility.UrlDecode(dto.Token);
-        var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+        /*var decodedToken = WebUtility.UrlDecode(dto.Token);*/
+        var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
 
         if (!result.Succeeded)
             return BadRequest(result.Errors);
@@ -76,9 +76,12 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
     {
         var user = await _userManager.FindByNameAsync(loginRequest.Username);
+        
         if (user is null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
-            return Unauthorized();
-
+        {
+            throw new UserIsNotAuthorizedException();
+        }
+        
         return new UserResponse
         {
             Id = user.Id.ToString(),
@@ -144,72 +147,59 @@ public class AccountController : ControllerBase
     [HttpGet("profile")]
     public async Task<ActionResult<UserCharacteristicsResponse>> GetCurrentUserCharacteristics()
     {
-        try
-        {
-            var user = await _userService.GetUserAsync();
+        var user = await _userService.GetUserAsync();
 
-            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+        var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
 
-            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+        var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
 
-            var usersWeightRecords = await _context.WeightRecords
-                .Include(w => w.User)
-                .Where(w => w.User.Id == user.Id)
-                .OrderByDescending(w => w.DateOfRecordCreated)
-                .Select(w => new WeightRecordResponse
-                {
-                    Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
-                    Weight = w.Weight
-                })
-                .ToListAsync();
-
-            var latestWeightRecord = usersWeightRecords.First();
-
-            var age = DateTime.Now.Year - user.DateOfBirth.Year;
-
-            if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
-
-            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
-                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
-
-            var dailyNutritionsResponse = new DailyNutritionsResponse
+        var usersWeightRecords = await _context.WeightRecords
+            .Include(w => w.User)
+            .Where(w => w.User.Id == user.Id)
+            .OrderByDescending(w => w.DateOfRecordCreated)
+            .Select(w => new WeightRecordResponse
             {
-                DailyCalories = calculator.CalculateDailyCalories(),
-                DailyProtein = calculator.CalculateDailyProtein(),
-                DailyFat = calculator.CalculateDailyFat(),
-                DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
-            };
+                Date = w.DateOfRecordCreated.ToString("dd/MM/yyyy"),
+                Weight = w.Weight
+            })
+            .ToListAsync();
 
-            var userCharResponse = new UserCharacteristicsResponse
-            {
-                Gender = user.UserGender.ToString(),
-                DateOfBirth = user.DateOfBirth.ToString("dd MMMM yyyy", new CultureInfo("uk-UA"))
-                ,
-                Age = age,
-                Height = user.Height,
-                CurrentGoalType = userCurrentGoalType.Goal.Name,
-                CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
-                DailyNutritions = dailyNutritionsResponse,
-                WeightRecords = usersWeightRecords
-            };
-            return Ok(userCharResponse);
-        }
-        catch (UserIsNotAuthorizedException exception)
+        var latestWeightRecord = usersWeightRecords.First();
+
+        var age = DateTime.Now.Year - user.DateOfBirth.Year;
+
+        if (DateTime.Now.DayOfYear < user.DateOfBirth.DayOfYear) age--;
+
+        var calculator = new CaloriesCalc(user.UserGender, age, user.Height, latestWeightRecord.Weight,
+            userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+
+        var dailyNutritionsResponse = new DailyNutritionsResponse
         {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
+            DailyCalories = calculator.CalculateDailyCalories(),
+            DailyProtein = calculator.CalculateDailyProtein(),
+            DailyFat = calculator.CalculateDailyFat(),
+            DailyCarbohydrates = calculator.CalculateDailyCarbohydrates()
+        };
+
+        var userCharResponse = new UserCharacteristicsResponse
         {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
+            Gender = user.UserGender.ToString(),
+            DateOfBirth = user.DateOfBirth.ToString("dd MMMM yyyy", new CultureInfo("uk-UA"))
+            ,
+            Age = age,
+            Height = user.Height,
+            CurrentGoalType = userCurrentGoalType.Goal.Name,
+            CurrentActivityLevel = userCurrentActivityLevel.ActivityLevel.Name,
+            DailyNutritions = dailyNutritionsResponse,
+            WeightRecords = usersWeightRecords
+        };
+        return Ok(userCharResponse);
     }
     
     [HttpPut("profile")]
     public async Task<ActionResult> UpdateUserProfile(UpdateUserProfileRequest request, TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
-        try
-        {
             var user = await _userService.GetUserAsync();
 
             await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -268,23 +258,13 @@ public class AccountController : ControllerBase
             await transaction.CommitAsync(cancellationToken);
 
             return NoContent();
-        }
-        catch (UserIsNotAuthorizedException exception)
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
     }
     
     [HttpPost("addWeightRecord")]
     public async Task<ActionResult> AddNewWeightRecord(TimeProvider timeProvider, WeightRecordRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
+        
             var user = await _userService.GetUserAsync();
 
             var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
@@ -313,39 +293,19 @@ public class AccountController : ControllerBase
             await _context.SaveChangesAsync(cancellationToken);
 
             return NoContent();
-        }
-        catch (UserIsNotAuthorizedException exception)
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
     }
     
     [HttpGet("currentUser")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
-        try
-        {
-            var user = await _userService.GetUserAsync();
+        var user = await _userService.GetUserAsync();
 
-            return new UserResponse
-            {
-                Id = user.Id.ToString(),
-                Username = user.UserName!,
-                Token = await _tokenService.GenerateToken(user)
-            };
-        }
-        catch (UserIsNotAuthorizedException exception)
+        return new UserResponse
         {
-            return StatusCode(StatusCodes.Status401Unauthorized, new { message = exception.Message });
-        }
-        catch (UserDoesNotExistException exception)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new { message = exception.Message });
-        }
+            Id = user.Id.ToString(),
+            Username = user.UserName!,
+            Token = await _tokenService.GenerateToken(user)
+        };
     }
 
     [HttpGet("activityLevels")]

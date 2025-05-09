@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NutriTrack.Entities;
 using NutriTrack.Entity;
@@ -21,6 +22,16 @@ public class ApplicationDbContext(DbContextOptions options) : IdentityDbContext<
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        
+        builder.Entity<IdentityUser>(b =>
+        {
+            b.ToTable("Users");
+        });
+
+        builder.Entity<IdentityRole>(b =>
+        {
+            b.ToTable("Roles");
+        });
 
         builder.Entity<User>()
             .Property(u => u.UserGender)
