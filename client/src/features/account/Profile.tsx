@@ -50,7 +50,7 @@ export default function Profile() {
         apiClient.Account.getActivityLevels().then(setActivities).catch(error => console.log(error));
     }, [dataUpdated]);
 
-    const hasWeightRecordForToday = (): boolean => {
+    const hasWeightRecordForToday = () => {
         if (!userData) return false;
         const today = dayjs().format('DD-MM-YYYY');
         return userData.weightRecords.some(record => record.date === today);
@@ -181,14 +181,14 @@ export default function Profile() {
                                     )}
                             </Box>
 
-                            <Tooltip title={hasWeightRecordForToday ? "Ви вже додали запис ваги на сьогодні" : "Додати новий запис ваги"}>
+                            <Tooltip title={hasWeightRecordForToday() ? "Ви вже додали запис ваги на сьогодні" : "Додати новий запис ваги"}>
                                 <span>
                                     <Button
                                         variant="contained"
                                         color="secondary"
                                         sx={{mt: 2}}
                                         onClick={handleAddWeightClick}
-                                        disabled={hasWeightRecordForToday}
+                                        disabled={hasWeightRecordForToday()}
                                     >
                                         Додати новий запис ваги
                                     </Button>
