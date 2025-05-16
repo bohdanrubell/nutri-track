@@ -21,7 +21,7 @@ interface Properties {
 export default function ProductNutritionCard({ product }: Properties) {
     const { user } = useAppSelector((state) => state.account);
     const [open, setOpen] = useState(false);
-    const [grams, setGrams] = useState(100);
+    const [grams, setGrams] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
@@ -29,10 +29,10 @@ export default function ProductNutritionCard({ product }: Properties) {
         try {
             await apiClient.Diary.addProductRecord({
                 productNutritionId: product.id,
-                consumedGrams: grams
+                consumedGrams: Number(grams)
             });
             setOpen(false);
-            setGrams(100);
+            setGrams('');
             toast.success("Успішно створено новий запис спожитого продукту!")
         } catch {
             toast.error("Помилка при додаванні продукту до щоденнику!");
@@ -134,18 +134,32 @@ export default function ProductNutritionCard({ product }: Properties) {
                         type="number"
                         fullWidth
                         value={grams}
-                        onChange={(e) => setGrams(Number(e.target.value))}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d{0,4}$/.test(value)) {
+                                setGrams(value);
+                            }
+                        }}
+                        error={grams === '' || Number(grams) <= 0}
+                        helperText={
+                            grams === ''
+                                ? 'Поле не може бути порожнім'
+                                : Number(grams) <= 0
+                                    ? 'Грами мають бути більше 0'
+                                    : ''
+                        }
                     />
+
 
                     <div style={{ marginTop: '16px' }}>
                         <Typography variant="subtitle2" color="text.secondary">
                             Попередні розрахунки:
                         </Typography>
                         <Typography variant="body2">
-                            {((product.caloriesPer100Grams * grams) / 100).toFixed(0)} ккал ·
-                            Б: {((product.proteinPer100Grams * grams) / 100).toFixed(1)}г ·
-                            Ж: {((product.fatPer100Grams * grams) / 100).toFixed(1)}г ·
-                            В: {((product.carbohydratesPer100Grams * grams) / 100).toFixed(1)}г
+                            {((product.caloriesPer100Grams * Number(grams)) / 100).toFixed(0)} ккал ·
+                            Б: {((product.proteinPer100Grams * Number(grams)) / 100).toFixed(1)}г ·
+                            Ж: {((product.fatPer100Grams * Number(grams)) / 100).toFixed(1)}г ·
+                            В: {((product.carbohydratesPer100Grams * Number(grams)) / 100).toFixed(1)}г
                         </Typography>
                     </div>
                 </DialogContent>
@@ -156,7 +170,7 @@ export default function ProductNutritionCard({ product }: Properties) {
                     <Button
                         variant="contained"
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || grams === '' || Number(grams) <= 0}
                     >
                         {loading ? 'Додається...' : 'Додати'}
                     </Button>

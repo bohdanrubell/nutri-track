@@ -187,11 +187,9 @@ public class ProductNutritionController : ControllerBase
             updatedProduct.ImageUrl = imageUrl;
         }
 
-        var result = await _context.SaveChangesAsync() > 0;
-        if (result)
-            return NoContent();
+        await _context.SaveChangesAsync();
 
-        return BadRequest("Виникла проблема зі оновленням продукту!");
+        return NoContent();
     }
     
     [Authorize(Roles = "Admin")]

@@ -90,7 +90,7 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
             }
 
             dispatch(setProduct(response));
-            dispatch(fetchProductAsync(response.id))
+            dispatch(fetchProductAsync(productNutrition!.id));
             dispatch(fetchCategories())
             cancelCreate();
         } catch (error) {

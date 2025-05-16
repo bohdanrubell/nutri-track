@@ -16,6 +16,7 @@ import { ProductNutrition } from '../../app/models/productNutrition.ts';
 import { toast } from 'react-toastify';
 
 export default function Diary() {
+    dayjs.locale('uk');
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [dailyRecord, setDailyRecord] = useState<DailyRecord | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -27,7 +28,7 @@ export default function Diary() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [allProducts, setAllProducts] = useState<ProductNutrition[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<ProductNutrition | null>(null);
-    const [grams, setGrams] = useState(100);
+    const [grams, setGrams] = useState('');
     const [loadingProducts, setLoadingProducts] = useState(false);
     const [addingProduct, setAddingProduct] = useState(false);
 
@@ -164,8 +165,17 @@ export default function Diary() {
                 ) : (
                     <Grid container justifyContent="center" alignItems="center" sx={{ height: '50vh', textAlign: 'center' }}>
                         <Typography variant="h6" sx={{ color: 'text.secondary' }}>
-                            На цю дату немає записів!<br />
-                            Додайте продукт, щоб створити запис.
+                            {isFutureDate() ? (
+                                <>
+                                    Це майбутня дата!<br />
+                                    Неможливо додавати записи на майбутні дати.
+                                </>
+                            ) : (
+                                <>
+                                    На цю дату немає записів!<br />
+                                    Додайте продукт, щоб створити запис.
+                                </>
+                            )}
                         </Typography>
                     </Grid>
                 )}
@@ -227,10 +237,13 @@ export default function Diary() {
                         margin="normal"
                         value={grams}
                         onChange={(e) => {
-                            const value = Number(e.target.value);
-                            setGrams(value >= 0 ? value : 0);
+                            const value = e.target.value;
+                            if (/^\d*$/.test(value)) {
+                                setGrams(value);
+                            }
                         }}
                     />
+
                     {selectedProduct && (
                         <div style={{ marginTop: '16px', textAlign: 'center' }}>
                             <img
@@ -244,10 +257,10 @@ export default function Diary() {
                                 Попередні розрахунки:
                             </Typography>
                             <Typography variant="body2" mt={1}>
-                                {(selectedProduct.caloriesPer100Grams * grams / 100).toFixed(0)} ккал ·
-                                Б: {(selectedProduct.proteinPer100Grams * grams / 100).toFixed(1)}г ·
-                                Ж: {(selectedProduct.fatPer100Grams * grams / 100).toFixed(1)}г ·
-                                В: {(selectedProduct.carbohydratesPer100Grams * grams / 100).toFixed(1)}г
+                                {(selectedProduct.caloriesPer100Grams * Number(grams) / 100).toFixed(0)} ккал ·
+                                Б: {(selectedProduct.proteinPer100Grams * Number(grams) / 100).toFixed(1)}г ·
+                                Ж: {(selectedProduct.fatPer100Grams * Number(grams) / 100).toFixed(1)}г ·
+                                В: {(selectedProduct.carbohydratesPer100Grams * Number(grams) / 100).toFixed(1)}г
                             </Typography>
                         </div>
                     )}
@@ -261,20 +274,20 @@ export default function Diary() {
                     }>Скасувати</Button>
                     <Button
                         variant="contained"
-                        disabled={!selectedProduct || grams <= 0 || addingProduct}
+                        disabled={!selectedProduct || Number(grams) <= 0 || addingProduct}
                         onClick={async () => {
-                            if (!selectedProduct || grams <= 0) return;
+                            if (!selectedProduct || Number(grams) <= 0) return;
                             setAddingProduct(true);
                             try {
                                 await apiClient.Diary.addProductRecord({
                                     productNutritionId: selectedProduct.id,
-                                    consumedGrams: grams,
+                                    consumedGrams: Number(grams),
                                     date: selectedDate.format("YYYY-MM-DD"),
                                 });
                                 toast.success('Продукт успішно додано!');
                                 setOpenAddDialog(false);
                                 setSelectedProduct(null);
-                                setGrams(100);
+                                setGrams('');
                                 setRefreshTrigger(prev => prev + 1);
                             } catch (error) {
                                 toast.error('Помилка додавання продукту!');
