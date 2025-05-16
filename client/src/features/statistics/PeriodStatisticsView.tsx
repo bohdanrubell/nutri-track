@@ -62,7 +62,7 @@ export default function PeriodStatisticsView() {
     return (
         <Box sx={{ maxWidth: 1200, mx: "auto", p: 3}}>
             <Typography variant="h4" gutterBottom textAlign="center">
-                Статистика за спожиті КБЖВ
+                Відомість за спожиті КБЖВ
             </Typography>
 
             <FormControl sx={{ mb: 4, minWidth: 250 }}>
@@ -78,7 +78,7 @@ export default function PeriodStatisticsView() {
                 </Select>
             </FormControl>
 
-            <Grid container spacing={4}>
+            <Grid container spacing={3}>
                 <Grid item xs={12} md={7}>
                     {loading ? (
                         <Typography textAlign="center" variant="h6" color="textSecondary">
@@ -93,7 +93,7 @@ export default function PeriodStatisticsView() {
                             <Box>
                                 <Paper elevation={4} sx={{ p: 2, borderRadius: 3 }}>
                                     <BarChart
-                                        xAxis={[{ scaleType: 'band', data: xLabels }]}
+                                        xAxis={[{ scaleType: 'band', data: xLabels}]}
                                         series={[
                                             {
                                                 type: 'bar',
@@ -124,7 +124,7 @@ export default function PeriodStatisticsView() {
                                                 color: '#f44336',
                                             },
                                         ]}
-                                        height={400}
+                                        height={300}
                                         tooltip={{ trigger: 'item' }}
                                         sx={{
                                             [`.${axisClasses.left} .MuiTypography-root`]: { fontSize: 14 },
@@ -136,39 +136,37 @@ export default function PeriodStatisticsView() {
                         </Fade>
                     )}
                 </Grid>
-
                 <Grid item xs={12} md={5}>
                     <Typography variant="h6" gutterBottom>
                         Статус по днях:
                     </Typography>
-
-                    <Stack spacing={1}>
-                        {data.map((day) => (
-                            <Paper
-                                key={day.date}
-                                sx={{
-                                    p: 2,
-                                    bgcolor: getStatusColor(day.status),
-                                    borderLeft: '6px solid',
-                                    borderColor:
-                                        day.status === 'Reached' ? 'green' :
-                                            day.status === 'Exceeded' ? 'orange' : 'red'
-                                }}
-                                elevation={1}
-                            >
-                                <>
-                                    <Typography fontWeight={500}>
+                    <Box sx={{ maxHeight: 300, overflowY: 'auto', pr: 1 }}>
+                        <Stack spacing={1}>
+                            {data.map((day) => (
+                                <Paper
+                                    key={day.date}
+                                    sx={{
+                                        p: 1.5,
+                                        bgcolor: getStatusColor(day.status),
+                                        borderLeft: '5px solid',
+                                        borderColor:
+                                            day.status === 'Reached' ? 'green' :
+                                                day.status === 'Exceeded' ? 'orange' : 'red'
+                                    }}
+                                    elevation={0}
+                                >
+                                    <Typography fontSize={14} fontWeight={500}>
                                         {day.date} — {getStatusText(day.status)}
                                     </Typography>
-                                    {day.exceededNutrients && day.exceededNutrients.length > 0 && (
-                                        <Typography variant="body2" color="text.secondary">
-                                            Перевищено: {day.exceededNutrients.join(', ')}
+                                    {day.exceededNutrients!.length > 0 && (
+                                        <Typography variant="body2" color="text.secondary" fontSize={13}>
+                                            Перевищено: {day.exceededNutrients!.join(', ')}
                                         </Typography>
                                     )}
-                                </>
-                            </Paper>
-                        ))}
-                    </Stack>
+                                </Paper>
+                            ))}
+                        </Stack>
+                    </Box>
                 </Grid>
             </Grid>
         </Box>

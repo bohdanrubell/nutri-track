@@ -1,5 +1,4 @@
 import ProductNutritionList from './ProductNutritionList.tsx';
-import LoadingComponent from '../../app/components/LoadingComponent.tsx';
 import { useAppDispatch, useAppSelector } from '../../app/store/store.ts';
 import { Paper, SpeedDial, SpeedDialAction, SpeedDialIcon} from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -21,13 +20,19 @@ import ProductCategoryManagement from "./ProductCategoryManagement.tsx";
 
 const sortOptions = [
     { value: 'name', label: 'Від А до Я' },
-    { value: 'caloriesDesc', label: 'Калорії - найбільше' },
     { value: 'calories', label: 'Калорії - найменше' },
+    { value: 'caloriesDesc', label: 'Калорії - найбільше' },
+    {value: 'protein', label: 'Білки - найменше'},
+    {value: 'proteinDesc', label: 'Білки - найбільше'},
+    {value: 'fat', label: 'Жири - найменше'},
+    {value: 'fatDesc', label: 'Жири - найбільше'},
+    {value: 'carbohydrates', label: 'Вуглеводи - найменше'},
+    {value: 'carbohydratesDesc', label: 'Вуглеводи - найбільше'}
 ]
 
 export default function ProductNutrition() {
     const {user} = useAppSelector(state => state.account)
-    const {products, productsLoaded ,categories, metaData} = useProductsNutrition();
+    const {products ,categories, metaData} = useProductsNutrition();
     const { productParams } = useAppSelector(state => state.productNutrition);
     const [createMode, setCreateMode] = useState(false);
     const dispatch = useAppDispatch();
@@ -54,7 +59,7 @@ export default function ProductNutrition() {
     if (categoryManagementMode) return <ProductCategoryManagement onClose={cancelCategoryManagement}/>;
 
 
-    if (!productsLoaded) return <LoadingComponent message='Завантаження продуктів...' />
+    // if (!productsLoaded) return <LoadingComponent message='Завантаження продуктів...' />
 
     return (
         <>

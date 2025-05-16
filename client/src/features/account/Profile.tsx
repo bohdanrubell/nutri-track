@@ -33,7 +33,7 @@ export default function Profile() {
     const [userData, setUserData] = useState<UserCharacteristics | null>(null);
     const [openWeightDialog, setOpenWeightDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [newWeight, setNewWeight] = useState<WeightRecord>({weight: 0, date: ''});
+    const [newWeight, setNewWeight] = useState<WeightRecord>({weight: 30, date: ''});
     const [dataUpdated, setDataUpdated] = useState(false);
     const [editedData, setEditedData] = useState<ProfileFormData>({
         gender: '',
@@ -71,8 +71,21 @@ export default function Profile() {
 
     const handleAddWeightClick = () => setOpenWeightDialog(true);
     const handleEditProfileClick = () => setOpenEditDialog(true);
-    const handleCloseWeightDialog = () => setOpenWeightDialog(false);
-    const handleCloseEditDialog = () => setOpenEditDialog(false);
+    const handleCloseWeightDialog = () => {
+        setNewWeight({weight: 30, date: ''})
+        setOpenWeightDialog(false);
+    }
+    const handleCloseEditDialog = () => {
+        setOpenEditDialog(false);
+        if (userData) {
+            setEditedData({
+                gender: userData.gender,
+                height: userData.height,
+                currentActivityLevel: userData.currentActivityLevel,
+                currentGoalType: userData.currentGoalType
+            });
+        }
+    };
 
     const handleSaveWeight = () => {
         if (!isNaN(newWeight.weight) && newWeight.weight > 0) {
@@ -207,13 +220,29 @@ export default function Profile() {
                         label="Вага (кг)"
                         type="number"
                         fullWidth
-                        value={newWeight.weight}
-                        onChange={(e) => setNewWeight({weight: parseFloat(e.target.value), date: ''})}
+                        value={newWeight.weight === 0 ? '' : newWeight.weight}
+                        onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            setNewWeight({ weight: isNaN(value) ? 0 : value, date: '' });
+                        }}
+                        error={newWeight.weight !== 0 && (newWeight.weight < 30 || newWeight.weight > 300)}
+                        helperText={
+                            newWeight.weight !== 0 && (newWeight.weight < 30 || newWeight.weight > 300)
+                                ? 'Значення має бути від 30 до 300 кг'
+                                : ''
+                        }
                     />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseWeightDialog}>Закрити</Button>
-                    <Button onClick={handleSaveWeight} variant="contained">Зберегти</Button>
+                    <Button
+                        onClick={handleSaveWeight}
+                        variant="contained"
+                        disabled={newWeight.weight < 30 || newWeight.weight > 300}
+                    >
+                        Зберегти
+                    </Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
@@ -235,8 +264,17 @@ export default function Profile() {
                         label="Зріст (см)"
                         type="number"
                         fullWidth
-                        value={editedData.height}
-                        onChange={(e) => setEditedData({...editedData, height: parseFloat(e.target.value)})}
+                        value={editedData.height || ''}
+                        onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            setEditedData({ ...editedData, height: isNaN(value) ? 0 : value });
+                        }}
+                        error={editedData.height < 50 || editedData.height > 300}
+                        helperText={
+                            editedData.height < 50 || editedData.height > 300
+                                ? 'Значення має бути від 50 до 300 см'
+                                : ''
+                        }
                         margin="dense"
                     />
 
@@ -268,7 +306,17 @@ export default function Profile() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseEditDialog}>Закрити</Button>
-                    <Button onClick={handleSaveProfile} variant="contained">Зберегти</Button>
+                    <Button
+                        onClick={handleSaveProfile}
+                        variant="contained"
+                        disabled={
+                            editedData.height < 50 ||
+                            editedData.height > 300 ||
+                            !editedData.height
+                        }
+                    >
+                        Зберегти
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>

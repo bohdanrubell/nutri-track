@@ -28,7 +28,7 @@ export default function Diary() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [allProducts, setAllProducts] = useState<ProductNutrition[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<ProductNutrition | null>(null);
-    const [grams, setGrams] = useState('');
+    const [grams, setGrams] = useState('100');
     const [loadingProducts, setLoadingProducts] = useState(false);
     const [addingProduct, setAddingProduct] = useState(false);
 
@@ -60,6 +60,12 @@ export default function Diary() {
         setOpenDialog(true);
     };
 
+    const handleClose = () => {
+        setOpenDialog(false);
+        setGrams('100');
+    };
+
+
     const totals = dailyRecord?.productRecords.reduce(
         (acc, product) => {
             acc.calories += Math.round(product.calories);
@@ -72,9 +78,15 @@ export default function Diary() {
     );
 
     const getColor = (value: number, norm: number): 'success' | 'error' | 'warning' => {
-        if (value < norm) return 'error';
-        if (value <= norm * 1.1) return 'success';
-        return 'warning';
+        if (value > norm * 1.15){
+            return 'warning';
+        }
+        if (value >= norm){
+           return 'success';
+        }
+        else {
+            return 'error';
+        }
     };
 
     const handleOpenAddProductDialog = async () => {
@@ -191,8 +203,21 @@ export default function Diary() {
                             label="Грами"
                             margin="dense"
                             value={editRecord?.consumedGrams ?? ''}
-                            onChange={(e) =>
-                                setEditRecord(prev => prev ? { ...prev, consumedGrams: parseInt(e.target.value) } : null)
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '' || (/^\d+$/.test(value))) {
+                                    setEditRecord(prev => prev ? { ...prev, consumedGrams: parseInt(value) } : null);
+                                }
+                            }}
+                            error={!editRecord?.consumedGrams || editRecord.consumedGrams < 1 || editRecord.consumedGrams > 2000}
+                            helperText={
+                                !editRecord?.consumedGrams
+                                    ? 'Поле не може бути порожнім'
+                                    : editRecord.consumedGrams < 1
+                                        ? 'Грами мають бути більше або дорівнювати 1'
+                                        : editRecord.consumedGrams > 2000
+                                            ? 'Максимальне значення - 2000 грамів'
+                                            : ''
                             }
                         />
                     ) : (
@@ -206,20 +231,23 @@ export default function Diary() {
                         color={dialogMode === 'edit' ? 'primary' : 'error'}
                         onClick={async () => {
                             if (!editRecord) return;
-                            if (dialogMode === 'edit') {
+                            if (dialogMode === 'edit' && editRecord.consumedGrams >= 1 && editRecord.consumedGrams <= 2000) {
                                 await apiClient.Diary.updateProductRecord(editRecord);
-                            } else {
+                                setOpenDialog(false);
+                                setRefreshTrigger(prev => prev + 1);
+                            } else if (dialogMode === 'delete') {
                                 await apiClient.Diary.deleteProductRecord(editRecord.productRecordId);
+                                setOpenDialog(false);
+                                setRefreshTrigger(prev => prev + 1);
                             }
-                            setOpenDialog(false);
-                            setRefreshTrigger(prev => prev + 1);
                         }}
+                        disabled={dialogMode === 'edit' && (!editRecord?.consumedGrams || editRecord.consumedGrams < 1 || editRecord.consumedGrams > 2000)}
                     >
                         {dialogMode === 'edit' ? 'Зберегти' : 'Видалити'}
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} maxWidth="sm" fullWidth>
+            <Dialog open={openAddDialog} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>Додати продукт до щоденника</DialogTitle>
                 <DialogContent>
                     <Autocomplete
@@ -231,17 +259,28 @@ export default function Diary() {
                         noOptionsText="Не знайдено продуктів"
                     />
                     <TextField
+                        autoFocus
+                        margin="dense"
                         label="Грами"
                         type="number"
                         fullWidth
-                        margin="normal"
                         value={grams}
                         onChange={(e) => {
                             const value = e.target.value;
-                            if (/^\d*$/.test(value)) {
+                            if (value === '' || (/^\d+$/.test(value))) {
                                 setGrams(value);
                             }
                         }}
+                        error={grams === '' || Number(grams) < 1 || Number(grams) > 2000}
+                        helperText={
+                            grams === ''
+                                ? 'Поле не може бути порожнім'
+                                : Number(grams) < 1
+                                    ? 'Грами мають бути більше 0 або дорівнювати 1'
+                                    : Number(grams) > 2000
+                                        ? 'Максимальне значення - 2000 грамів'
+                                        : ''
+                        }
                     />
 
                     {selectedProduct && (
@@ -258,9 +297,9 @@ export default function Diary() {
                             </Typography>
                             <Typography variant="body2" mt={1}>
                                 {(selectedProduct.caloriesPer100Grams * Number(grams) / 100).toFixed(0)} ккал ·
-                                Б: {(selectedProduct.proteinPer100Grams * Number(grams) / 100).toFixed(1)}г ·
-                                Ж: {(selectedProduct.fatPer100Grams * Number(grams) / 100).toFixed(1)}г ·
-                                В: {(selectedProduct.carbohydratesPer100Grams * Number(grams) / 100).toFixed(1)}г
+                                Б: {(selectedProduct.proteinPer100Grams * Number(grams) / 100).toFixed(0)}г ·
+                                Ж: {(selectedProduct.fatPer100Grams * Number(grams) / 100).toFixed(0)}г ·
+                                В: {(selectedProduct.carbohydratesPer100Grams * Number(grams) / 100).toFixed(0)}г
                             </Typography>
                         </div>
                     )}
@@ -268,13 +307,14 @@ export default function Diary() {
 
                 <DialogActions>
                     <Button onClick={() => {
-                        setOpenAddDialog(false)
-                        setSelectedProduct(null)
+                        setOpenAddDialog(false);
+                        setSelectedProduct(null);
+                        setGrams('100');
                     }
                     }>Скасувати</Button>
                     <Button
                         variant="contained"
-                        disabled={!selectedProduct || Number(grams) <= 0 || addingProduct}
+                        disabled={!selectedProduct || Number(grams) <= 0 || Number(grams) > 2000 || addingProduct}
                         onClick={async () => {
                             if (!selectedProduct || Number(grams) <= 0) return;
                             setAddingProduct(true);
@@ -287,7 +327,7 @@ export default function Diary() {
                                 toast.success('Продукт успішно додано!');
                                 setOpenAddDialog(false);
                                 setSelectedProduct(null);
-                                setGrams('');
+                                setGrams('100');
                                 setRefreshTrigger(prev => prev + 1);
                             } catch (error) {
                                 toast.error('Помилка додавання продукту!');

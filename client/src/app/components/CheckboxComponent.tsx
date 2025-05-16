@@ -28,7 +28,7 @@ export default function CheckboxComponent({ availableItems, selectedItems = [], 
     }
 
     return (
-        <SimpleBar style={{ maxHeight: 200 }}>
+        <SimpleBar style={{ maxHeight: 170 }}>
             <Typography variant="subtitle2" fontWeight="bold" mb={1}>
                 Вибір категорії
             </Typography>

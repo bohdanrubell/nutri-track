@@ -235,23 +235,28 @@ public class AccountController : ControllerBase
             
             await _userManager.UpdateAsync(user);
             
+            var date = DateTime.Now.Date;
+            
             var todayRecord = await _context.Records
-                .FirstAsync(r => r.Date.Date == DateTime.Today 
+                .SingleOrDefaultAsync(r => r.Date.Date == date 
                                           && r.Diary.User.Id == user.Id, 
                     cancellationToken);
-            
-            var age = DateTime.Now.Year - user.DateOfBirth.Year;
-            if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
 
-            var weight = await _userService.GetLatestWeightRecordAsync(user.Id);
+            if (todayRecord is not null)
+            {
+                var age = DateTime.Now.Year - user.DateOfBirth.Year;
+                if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
+
+                var weight = await _userService.GetLatestWeightRecordAsync(user.Id);
             
-            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, weight,
-                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, weight,
+                    userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
             
-            todayRecord.DailyCalories = calculator.CalculateDailyCalories();
-            todayRecord.DailyProtein = calculator.CalculateDailyProtein();
-            todayRecord.DailyFat = calculator.CalculateDailyFat();
-            todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+                todayRecord.DailyCalories = calculator.CalculateDailyCalories();
+                todayRecord.DailyProtein = calculator.CalculateDailyProtein();
+                todayRecord.DailyFat = calculator.CalculateDailyFat();
+                todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+            }
             
             await _context.SaveChangesAsync(cancellationToken);
             

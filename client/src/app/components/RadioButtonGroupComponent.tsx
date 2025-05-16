@@ -1,4 +1,5 @@
 import { FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import SimpleBar from "simplebar-react";
 
 interface RadioButtonProperties {
     options: any[];
@@ -8,6 +9,7 @@ interface RadioButtonProperties {
 
 export default function RadioButtonGroupComponent({ options, onChange, selectedValue }: RadioButtonProperties) {
     return (
+        <SimpleBar style={{maxHeight: 150}}>
         <FormControl component="fieldset">
             <RadioGroup onChange={onChange} value={selectedValue}>
                 {options.map(({ value, label }) => (
@@ -19,5 +21,6 @@ export default function RadioButtonGroupComponent({ options, onChange, selectedV
                 ))}
             </RadioGroup>
         </FormControl>
+        </SimpleBar>
     )
 }

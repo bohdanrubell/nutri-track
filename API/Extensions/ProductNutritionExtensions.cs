@@ -12,6 +12,12 @@ public static class ProductNutritionExtensions
         {
             "calories" => query.OrderBy(p => p.CaloriesPer100Grams),
             "caloriesDesc" => query.OrderByDescending(p => p.CaloriesPer100Grams),
+            "protein" => query.OrderBy(p => p.ProteinPer100Grams),
+            "proteinDesc" => query.OrderByDescending(p => p.ProteinPer100Grams),
+            "fat" => query.OrderBy(p => p.FatPer100Grams),
+            "fatDesc" => query.OrderByDescending(p => p.FatPer100Grams),
+            "carbohydrates" => query.OrderBy(p => p.CarbohydratesPer100Grams),
+            "carbohydratesDesc" => query.OrderByDescending(p => p.CarbohydratesPer100Grams),
             _ => query.OrderBy(n => n.Name)
         };
 

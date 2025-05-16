@@ -149,8 +149,13 @@ export default function ProductNutritionForm({productNutrition, cancelCreate}: F
                 </Grid>
                 <Box display='flex' justifyContent='space-around' sx={{mt: 3}}>
                     <Button onClick={cancelCreate} variant='contained' color='inherit'>Скасувати</Button>
-                    <LoadingButton loading={isSubmitting} type='submit' variant='contained'
-                                   color='success'>
+                    <LoadingButton
+                        loading={isSubmitting}
+                        type='submit'
+                        variant='contained'
+                        color='success'
+                        disabled={!isDirty || isSubmitting}
+                    >
                         {isEditMode ? "Оновити" : "Додати"}
                     </LoadingButton>
                 </Box>

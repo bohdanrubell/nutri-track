@@ -21,7 +21,7 @@ interface Properties {
 export default function ProductNutritionCard({ product }: Properties) {
     const { user } = useAppSelector((state) => state.account);
     const [open, setOpen] = useState(false);
-    const [grams, setGrams] = useState('');
+    const [grams, setGrams] = useState('100');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
@@ -32,7 +32,7 @@ export default function ProductNutritionCard({ product }: Properties) {
                 consumedGrams: Number(grams)
             });
             setOpen(false);
-            setGrams('');
+            setGrams('100');
             toast.success("Успішно створено новий запис спожитого продукту!")
         } catch {
             toast.error("Помилка при додаванні продукту до щоденнику!");
@@ -40,6 +40,12 @@ export default function ProductNutritionCard({ product }: Properties) {
             setLoading(false);
         }
     };
+
+    const handleClose = () => {
+        setOpen(false);
+        setGrams('100');
+    };
+
 
     return (
         <>
@@ -124,7 +130,7 @@ export default function ProductNutritionCard({ product }: Properties) {
             </CardActions>
         </Card>
 
-            <Dialog open={open} onClose={() => setOpen(false)}>
+            <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Скільки грамів бажаєте додати?</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -136,17 +142,19 @@ export default function ProductNutritionCard({ product }: Properties) {
                         value={grams}
                         onChange={(e) => {
                             const value = e.target.value;
-                            if (/^\d{0,4}$/.test(value)) {
+                            if (value === '' || (/^\d+$/.test(value) && parseInt(value) >= 1)) {
                                 setGrams(value);
                             }
                         }}
-                        error={grams === '' || Number(grams) <= 0}
+                        error={grams === '' || Number(grams) < 1 || Number(grams) > 2000}
                         helperText={
                             grams === ''
                                 ? 'Поле не може бути порожнім'
-                                : Number(grams) <= 0
-                                    ? 'Грами мають бути більше 0'
-                                    : ''
+                                : Number(grams) < 1
+                                    ? 'Грами мають бути більше або дорівнювати 1'
+                                    : Number(grams) > 2000
+                                        ? 'Грами не можуть перевищувати 2000'
+                                        : ''
                         }
                     />
 
@@ -164,16 +172,16 @@ export default function ProductNutritionCard({ product }: Properties) {
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} disabled={loading}>
+                    <Button onClick={handleClose} disabled={loading}>
                         Скасувати
                     </Button>
                     <Button
-                        variant="contained"
-                        onClick={handleSubmit}
-                        disabled={loading || grams === '' || Number(grams) <= 0}
-                    >
-                        {loading ? 'Додається...' : 'Додати'}
-                    </Button>
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={loading || grams === '' || Number(grams) < 1 || Number(grams) > 2000}
+                >
+                    {loading ? 'Додається...' : 'Додати'}
+                </Button>
                 </DialogActions>
             </Dialog>
 

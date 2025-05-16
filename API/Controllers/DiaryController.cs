@@ -72,7 +72,7 @@ public class DiaryController : ControllerBase
         }
         
         var user = await _userService.GetUserAsync();
-        var currentDate = productRecordRequest.Date?.Date ?? DateTime.Now;
+        var currentDate = productRecordRequest.Date?.Date ?? DateTime.Now.Date;
 
         var record = await GetOrCreateRecordAsync(user.Id, currentDate);
 
