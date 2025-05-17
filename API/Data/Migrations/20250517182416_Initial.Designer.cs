@@ -12,7 +12,7 @@ using NutriTrack.Data;
 namespace NutriTrack.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250509193228_Initial")]
+    [Migration("20250517182416_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -351,228 +351,6 @@ namespace NutriTrack.Data.Migrations
                     b.HasIndex("ProductNutritionCategoryId");
 
                     b.ToTable("ProductNutritions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CaloriesPer100Grams = 52m,
-                            CarbohydratesPer100Grams = 14m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Яблуко",
-                            ProductNutritionCategoryId = 1,
-                            ProteinPer100Grams = 0m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CaloriesPer100Grams = 96m,
-                            CarbohydratesPer100Grams = 23m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Банан",
-                            ProductNutritionCategoryId = 1,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CaloriesPer100Grams = 47m,
-                            CarbohydratesPer100Grams = 12m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Апельсин",
-                            ProductNutritionCategoryId = 1,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CaloriesPer100Grams = 32m,
-                            CarbohydratesPer100Grams = 8m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Полуниця",
-                            ProductNutritionCategoryId = 1,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CaloriesPer100Grams = 69m,
-                            CarbohydratesPer100Grams = 18m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Виноград",
-                            ProductNutritionCategoryId = 1,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CaloriesPer100Grams = 41m,
-                            CarbohydratesPer100Grams = 10m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Морковка",
-                            ProductNutritionCategoryId = 2,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CaloriesPer100Grams = 55m,
-                            CarbohydratesPer100Grams = 11m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Броколі",
-                            ProductNutritionCategoryId = 2,
-                            ProteinPer100Grams = 4m
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CaloriesPer100Grams = 18m,
-                            CarbohydratesPer100Grams = 4m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Помідор",
-                            ProductNutritionCategoryId = 2,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CaloriesPer100Grams = 23m,
-                            CarbohydratesPer100Grams = 4m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Шпинат",
-                            ProductNutritionCategoryId = 2,
-                            ProteinPer100Grams = 3m
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CaloriesPer100Grams = 16m,
-                            CarbohydratesPer100Grams = 4m,
-                            FatPer100Grams = 0m,
-                            IsDeleted = false,
-                            Name = "Огірок",
-                            ProductNutritionCategoryId = 2,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CaloriesPer100Grams = 42m,
-                            CarbohydratesPer100Grams = 5m,
-                            FatPer100Grams = 1m,
-                            IsDeleted = false,
-                            Name = "Молоко",
-                            ProductNutritionCategoryId = 3,
-                            ProteinPer100Grams = 3m
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CaloriesPer100Grams = 59m,
-                            CarbohydratesPer100Grams = 7m,
-                            FatPer100Grams = 2m,
-                            IsDeleted = false,
-                            Name = "Йогурт",
-                            ProductNutritionCategoryId = 3,
-                            ProteinPer100Grams = 3m
-                        },
-                        new
-                        {
-                            Id = 13,
-                            CaloriesPer100Grams = 402m,
-                            CarbohydratesPer100Grams = 1m,
-                            FatPer100Grams = 33m,
-                            IsDeleted = false,
-                            Name = "Сир",
-                            ProductNutritionCategoryId = 3,
-                            ProteinPer100Grams = 25m
-                        },
-                        new
-                        {
-                            Id = 14,
-                            CaloriesPer100Grams = 717m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 81m,
-                            IsDeleted = false,
-                            Name = "Масло",
-                            ProductNutritionCategoryId = 3,
-                            ProteinPer100Grams = 1m
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CaloriesPer100Grams = 98m,
-                            CarbohydratesPer100Grams = 3m,
-                            FatPer100Grams = 4m,
-                            IsDeleted = false,
-                            Name = "Сир кисломолочий",
-                            ProductNutritionCategoryId = 3,
-                            ProteinPer100Grams = 11m
-                        },
-                        new
-                        {
-                            Id = 16,
-                            CaloriesPer100Grams = 165m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 4m,
-                            IsDeleted = false,
-                            Name = "Курине філе",
-                            ProductNutritionCategoryId = 4,
-                            ProteinPer100Grams = 31m
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CaloriesPer100Grams = 250m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 15m,
-                            IsDeleted = false,
-                            Name = "Яловичина",
-                            ProductNutritionCategoryId = 4,
-                            ProteinPer100Grams = 26m
-                        },
-                        new
-                        {
-                            Id = 18,
-                            CaloriesPer100Grams = 242m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 14m,
-                            IsDeleted = false,
-                            Name = "Свинячий стейк",
-                            ProductNutritionCategoryId = 4,
-                            ProteinPer100Grams = 27m
-                        },
-                        new
-                        {
-                            Id = 19,
-                            CaloriesPer100Grams = 189m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 7m,
-                            IsDeleted = false,
-                            Name = "Індичка",
-                            ProductNutritionCategoryId = 4,
-                            ProteinPer100Grams = 29m
-                        },
-                        new
-                        {
-                            Id = 20,
-                            CaloriesPer100Grams = 294m,
-                            CarbohydratesPer100Grams = 0m,
-                            FatPer100Grams = 21m,
-                            IsDeleted = false,
-                            Name = "Каре ягня",
-                            ProductNutritionCategoryId = 4,
-                            ProteinPer100Grams = 25m
-                        });
                 });
 
             modelBuilder.Entity("NutriTrack.Entities.ProductNutritionCategory", b =>
@@ -618,6 +396,42 @@ namespace NutriTrack.Data.Migrations
                             Id = 4,
                             IsDeleted = false,
                             Name = "М'ясо"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsDeleted = false,
+                            Name = "Зернові та хліб"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsDeleted = false,
+                            Name = "Крупи"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsDeleted = false,
+                            Name = "Напої"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IsDeleted = false,
+                            Name = "Горіхи та насіння"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            IsDeleted = false,
+                            Name = "Фастфуд та снеки"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            IsDeleted = false,
+                            Name = "Десерти"
                         });
                 });
 
@@ -820,13 +634,13 @@ namespace NutriTrack.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1becdb31-bd13-49b1-a012-355c0d9a5007"),
+                            Id = new Guid("d18fc3d1-576c-41cf-835e-b510b0d11af4"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("7ba35f34-1e69-45dc-bd15-7193f13f4498"),
+                            Id = new Guid("80158197-82ca-43c2-a82b-e6006269a12b"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

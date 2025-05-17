@@ -433,8 +433,8 @@ namespace NutriTrack.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("1becdb31-bd13-49b1-a012-355c0d9a5007"), null, "User", "USER" },
-                    { new Guid("7ba35f34-1e69-45dc-bd15-7193f13f4498"), null, "Admin", "ADMIN" }
+                    { new Guid("80158197-82ca-43c2-a82b-e6006269a12b"), null, "Admin", "ADMIN" },
+                    { new Guid("d18fc3d1-576c-41cf-835e-b510b0d11af4"), null, "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -445,34 +445,13 @@ namespace NutriTrack.Data.Migrations
                     { 1, false, "Фрукти" },
                     { 2, false, "Овочі" },
                     { 3, false, "Молочні продукти" },
-                    { 4, false, "М'ясо" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "ProductNutritions",
-                columns: new[] { "Id", "CaloriesPer100Grams", "CarbohydratesPer100Grams", "FatPer100Grams", "ImageUrl", "IsDeleted", "Name", "ProductNutritionCategoryId", "ProteinPer100Grams" },
-                values: new object[,]
-                {
-                    { 1, 52m, 14m, 0m, null, false, "Яблуко", 1, 0m },
-                    { 2, 96m, 23m, 0m, null, false, "Банан", 1, 1m },
-                    { 3, 47m, 12m, 0m, null, false, "Апельсин", 1, 1m },
-                    { 4, 32m, 8m, 0m, null, false, "Полуниця", 1, 1m },
-                    { 5, 69m, 18m, 0m, null, false, "Виноград", 1, 1m },
-                    { 6, 41m, 10m, 0m, null, false, "Морковка", 2, 1m },
-                    { 7, 55m, 11m, 0m, null, false, "Броколі", 2, 4m },
-                    { 8, 18m, 4m, 0m, null, false, "Помідор", 2, 1m },
-                    { 9, 23m, 4m, 0m, null, false, "Шпинат", 2, 3m },
-                    { 10, 16m, 4m, 0m, null, false, "Огірок", 2, 1m },
-                    { 11, 42m, 5m, 1m, null, false, "Молоко", 3, 3m },
-                    { 12, 59m, 7m, 2m, null, false, "Йогурт", 3, 3m },
-                    { 13, 402m, 1m, 33m, null, false, "Сир", 3, 25m },
-                    { 14, 717m, 0m, 81m, null, false, "Масло", 3, 1m },
-                    { 15, 98m, 3m, 4m, null, false, "Сир кисломолочий", 3, 11m },
-                    { 16, 165m, 0m, 4m, null, false, "Курине філе", 4, 31m },
-                    { 17, 250m, 0m, 15m, null, false, "Яловичина", 4, 26m },
-                    { 18, 242m, 0m, 14m, null, false, "Свинячий стейк", 4, 27m },
-                    { 19, 189m, 0m, 7m, null, false, "Індичка", 4, 29m },
-                    { 20, 294m, 0m, 21m, null, false, "Каре ягня", 4, 25m }
+                    { 4, false, "М'ясо" },
+                    { 5, false, "Зернові та хліб" },
+                    { 6, false, "Крупи" },
+                    { 7, false, "Напої" },
+                    { 8, false, "Горіхи та насіння" },
+                    { 9, false, "Фастфуд та снеки" },
+                    { 10, false, "Десерти" }
                 });
 
             migrationBuilder.CreateIndex(
