@@ -113,7 +113,9 @@ const Account = {
             email,
             token,
             newPassword
-        })
+        }),
+    checkAvailability: (email: string, username: string) =>
+        requests.get('account/check-availability', new URLSearchParams({ email, username }))
 }
 
 const ProductNutrition = {

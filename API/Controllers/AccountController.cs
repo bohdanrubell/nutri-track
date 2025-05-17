@@ -144,6 +144,20 @@ public class AccountController : ControllerBase
         return StatusCode(201);
     }
 
+    [HttpGet("check-availability")]
+    public async Task<IActionResult> CheckAvailability([FromQuery] string email, [FromQuery] string username)
+    {
+        var emailExists = await _userManager.FindByEmailAsync(email) != null;
+        var usernameExists = await _userManager.FindByNameAsync(username) != null;
+
+        return Ok(new
+        {
+            isEmailAvailable = !emailExists,
+            isUsernameAvailable = !usernameExists
+        });
+    }
+
+    
     [HttpGet("profile")]
     public async Task<ActionResult<UserCharacteristicsResponse>> GetCurrentUserCharacteristics()
     {

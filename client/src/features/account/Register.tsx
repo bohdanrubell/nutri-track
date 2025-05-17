@@ -7,7 +7,8 @@ import {
     Button,
     IconButton,
     Dialog,
-    DialogTitle, DialogContent
+    DialogTitle, DialogContent,
+    CircularProgress
 } from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {useForm} from "react-hook-form";
@@ -23,6 +24,7 @@ import InputComponent from "../../app/components/InputComponent.tsx";
 import {zodResolver} from "@hookform/resolvers/zod";
 import ListComponent from "../../app/components/ListComponent.tsx";
 import DatePickerComponent from "../../app/components/DatePickerComponent.tsx";
+import {useDebounce} from "../../app/hooks/useDebounce.ts";
 
 export default function Register() {
     const [openDialog, setOpenDialog] = useState(false);
@@ -30,12 +32,37 @@ export default function Register() {
     const handleCloseDialog = () => setOpenDialog(false);
     const [goals, setGoals] = useState<GoalType[]>([]);
     const [activities, setActivities] = useState<ActivityLevel[]>([]);
+    const [isChecking, setIsChecking] = useState(false);
+    const [availability, setAvailability] = useState<{isEmailAvailable: boolean, isUsernameAvailable: boolean} | null>(null);
 
     const navigate = useNavigate();
-    const {control, handleSubmit,  formState: {isSubmitting, isValid}} = useForm<RegisterFormData>({
+    const {control, handleSubmit, watch, formState: {isValid}} = useForm<RegisterFormData>({
         mode: 'all',
         resolver: zodResolver(registerSchema)
     });
+
+    const email = watch('email');
+    const username = watch('username');
+    const debouncedEmail = useDebounce(email, 500);
+    const debouncedUsername = useDebounce(username, 500);
+
+    useEffect(() => {
+        const checkAvailability = async () => {
+            if (!debouncedEmail || !debouncedUsername) return;
+            
+            setIsChecking(true);
+            try {
+                const result = await apiClient.Account.checkAvailability(debouncedEmail, debouncedUsername);
+                setAvailability(result);
+            } catch (error) {
+                console.error('Error checking availability:', error);
+            } finally {
+                setIsChecking(false);
+            }
+        };
+
+        checkAvailability();
+    }, [debouncedEmail, debouncedUsername]);
 
     useEffect(() => {
         apiClient.Account.getGoalTypes().then(setGoals).catch(error => console.log(error));
@@ -63,6 +90,12 @@ export default function Register() {
                                 control={control}
                                 label="Ім'я"
                                 name="username"
+                                helperText={
+                                    isChecking ? 'Перевірка...' :
+                                    availability && !availability.isUsernameAvailable ? 'Це ім\'я вже зайняте' :
+                                    availability && availability.isUsernameAvailable ? 'Ім\'я доступне' : ''
+                                }
+                                error={!!(availability && !availability.isUsernameAvailable)}
                             />
                             <InputComponent
                                 control={control}
@@ -72,7 +105,14 @@ export default function Register() {
                             <InputComponent
                                 control={control}
                                 label="Електрона пошта"
-                                name="email"/>
+                                name="email"
+                                helperText={
+                                    isChecking ? 'Перевірка...' :
+                                    availability && !availability.isEmailAvailable ? 'Ця пошта вже зареєстрована' :
+                                    availability && availability.isEmailAvailable ? 'Пошта доступна' : ''
+                                }
+                                error={!!(availability && !availability.isEmailAvailable)}
+                            />
                             <ListComponent
                                 control={control}
                                 label="Стать"
@@ -117,8 +157,7 @@ export default function Register() {
                         </Grid>
                     </Grid>
                     <Button
-                        loading={isSubmitting}
-                        disabled={!isValid}
+                        disabled={!isValid || !!(availability && (!availability.isEmailAvailable || !availability.isUsernameAvailable))}
                         type="submit"
                         variant="outlined"
                         sx={{
@@ -128,7 +167,7 @@ export default function Register() {
                             display: 'block'
                         }}
                     >
-                        Зареєструватись
+                        {isChecking ? <CircularProgress size={24} /> : 'Зареєструватись'}
                     </Button>
                     <Grid container direction="row" sx={{justifyContent: "center", alignItems: "center"}}>
                         <Grid>

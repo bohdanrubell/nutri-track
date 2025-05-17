@@ -4,6 +4,8 @@ import { useController, UseControllerProps, FieldValues } from "react-hook-form"
 interface Properties<TFieldValues extends FieldValues> extends UseControllerProps<TFieldValues> {
     label: string;
     type?: string;
+    helperText?: string;
+    error?: boolean;
 }
 
 export default function InputComponent<TFieldValues extends FieldValues>(properties: Properties<TFieldValues>) {
@@ -23,8 +25,8 @@ export default function InputComponent<TFieldValues extends FieldValues>(propert
             onChange={handleChange}
             onBlur={field.onBlur}
             type={properties.type}
-            error={!!fieldState.error}
-            helperText={fieldState.error?.message}
+            error={properties.error ?? !!fieldState.error}
+            helperText={properties.helperText ?? fieldState.error?.message}
         />
     );
 }
