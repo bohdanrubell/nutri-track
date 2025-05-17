@@ -43,13 +43,13 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null) return Ok(); // не палимо юзера
+        if (user == null) return Ok();
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = WebUtility.UrlEncode(token);
 
         var callbackUrl = $"{_configuration["FrontendUrl"]}/reset-password?email={dto.Email}&token={encodedToken}";
-        var message = $"<p>Щоб скинути пароль, натисни <a href='{callbackUrl}'>тут</a>.</p>";
+        var message = $"<p>Вітаю, {user.UserName}, щоб відновити пароль, натисни <a href='{callbackUrl}'>тут</a>.</p>";
 
         await _emailSender.SendAsync(dto.Email, "Відновлення паролю NutriTrack", message);
         return Ok("Лист надіслано (якщо email існує)");
@@ -79,7 +79,7 @@ public class AccountController : ControllerBase
         
         if (user is null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
-            throw new UserIsNotAuthorizedException();
+            throw new UserIsNotAuthorizedException("Невірне ім'я користувача або пароль.");
         }
         
         return new UserResponse

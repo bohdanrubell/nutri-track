@@ -2,8 +2,8 @@
 
 public class UserIsNotAuthorizedException : AppException
 {
-    public UserIsNotAuthorizedException() 
-        : base("Користувач не авторизований!") 
+    public UserIsNotAuthorizedException(string message = "Користувач не авторизований!") 
+        : base(message) 
     {
     }
 }
