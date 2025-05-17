@@ -288,7 +288,7 @@ export default function Diary() {
                             <img
                                 src={selectedProduct.imageId
                                     ? selectedProduct.imageId
-                                    : '/images/TEST_PICTURE.jpg'}
+                                    : 'https://res.cloudinary.com/dzvxzhmfr/image/upload/v1747510946/product_without_pic_main.jpg'}
                                 alt={selectedProduct.name}
                                 style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain', background: '#f0f0f0', borderRadius: 8 }}
                             />

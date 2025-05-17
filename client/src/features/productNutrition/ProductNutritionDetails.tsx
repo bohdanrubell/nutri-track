@@ -76,7 +76,7 @@ export default function ProductNutritionDetails() {
             <Grid container spacing={6}>
                 <Grid size={{xs:12, md:6}} display="flex" justifyContent="center" alignItems="center">
                     <img
-                        src={productNutrition.imageId || "/images/TEST_PICTURE.jpg"}
+                        src={productNutrition.imageId || "https://res.cloudinary.com/dzvxzhmfr/image/upload/v1747510946/product_without_pic_main.jpg"}
                         alt={productNutrition.name}
                         style={{ width: '80%', maxHeight: 400, objectFit: 'contain' }}
                     />

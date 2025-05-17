@@ -22,7 +22,7 @@ export default function HomePage() {
             }}
         >
             <img
-                src="/images/home_page_background.jpg"
+                src="https://res.cloudinary.com/dzvxzhmfr/image/upload/v1744540666/home_page.jpg"
                 alt="NutriTrack background"
                 style={{
                     position: 'absolute',
@@ -59,7 +59,7 @@ export default function HomePage() {
                 }}
             >
                 <img
-                    src="/images/icon.png"
+                    src="https://res.cloudinary.com/dzvxzhmfr/image/upload/v1747509918/icon.png"
                     alt="NutriTrack Icon"
                     style={{width: 40, height: 40}}
                 />

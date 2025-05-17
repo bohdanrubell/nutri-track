@@ -23,6 +23,10 @@ export default function PaginationComponent({ metaData, onPageChange }: Paginati
                     count={totalPages}
                     page={currentPage}
                     onChange={(_e, page) => onPageChange(page)}
+                    siblingCount={1} // кількість сторінок по боках від активної
+                    boundaryCount={1} // кількість крайніх сторінок ліворуч і праворуч
+                    showFirstButton
+                    showLastButton
                 />
             )}
         </Box>

@@ -37,7 +37,7 @@ export default function Header({ toggleTheme, darkMode }: HeaderProps) {
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box display='flex' alignItems='center' gap={1}>
                     <img
-                        src='/images/icon.png'
+                        src='https://res.cloudinary.com/dzvxzhmfr/image/upload/v1747509918/icon.png'
                         alt='logo'
                         style={{width: 32, height: 32}}
                     />

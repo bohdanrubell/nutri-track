@@ -84,7 +84,7 @@ export default function ProductNutritionCard({ product }: Properties) {
                 component="img"
                 image={product.imageId
                     ? product.imageId
-                    : "/images/TEST_PICTURE.jpg"}
+                    : "https://res.cloudinary.com/dzvxzhmfr/image/upload/v1747510946/product_without_pic_main.jpg"}
                 alt={product.name}
                 sx={{
                     height: 100,
