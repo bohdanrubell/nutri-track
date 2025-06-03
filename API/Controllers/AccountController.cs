@@ -290,24 +290,27 @@ public class AccountController : ControllerBase
             await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
             
             var todayRecord = await _context.Records
-                .FirstAsync(r => r.Date.Date == DateTime.Today 
+                .FirstOrDefaultAsync(r => r.Date.Date == DateTime.Today 
                                  && r.Diary.User.Id == user.Id, 
                     cancellationToken);
             
-            var age = DateTime.Now.Year - user.DateOfBirth.Year;
-            if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
+            if (todayRecord is not null)
+            {
+                var age = DateTime.Now.Year - user.DateOfBirth.Year;
+                if (DateTime.Now < user.DateOfBirth.AddYears(age)) age--;
             
-            var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
+                var userCurrentGoalType = await _userService.GetLastUsersGoalTypeLog(user.Id);
 
-            var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
+                var userCurrentActivityLevel = await _userService.GetLastUserActivityLevelLog(user.Id);
             
-            var calculator = new CaloriesCalc(user.UserGender, age, user.Height, newWeightRecord.Weight,
-                userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
+                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, newWeightRecord.Weight,
+                    userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
             
-            todayRecord.DailyCalories = calculator.CalculateDailyCalories();
-            todayRecord.DailyProtein = calculator.CalculateDailyProtein();
-            todayRecord.DailyFat = calculator.CalculateDailyFat();
-            todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+                todayRecord.DailyCalories = calculator.CalculateDailyCalories();
+                todayRecord.DailyProtein = calculator.CalculateDailyProtein();
+                todayRecord.DailyFat = calculator.CalculateDailyFat();
+                todayRecord.DailyCarbohydrates = calculator.CalculateDailyCarbohydrates();
+            }
             
             await _context.SaveChangesAsync(cancellationToken);
 
