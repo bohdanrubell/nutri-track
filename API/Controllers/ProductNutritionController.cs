@@ -103,8 +103,6 @@ public class ProductNutritionController : ControllerBase
 
         return Ok(productsDto);
     }
-
-    
     
     [Authorize(Roles = "Admin")]
     [HttpPost("create")]
@@ -200,10 +198,10 @@ public class ProductNutritionController : ControllerBase
 
         if (product == null) return NotFound();
 
-        /*if (!string.IsNullOrEmpty(product.ImageUrl))
+        if (!string.IsNullOrEmpty(product.ImageUrl))
         {
             await _imageService.DeleteImageAsync(product.ImageUrl);
-        }*/
+        }
 
         product.IsDeleted = true;
 

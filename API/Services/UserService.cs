@@ -53,12 +53,11 @@ public class UserService
             .FirstAsync();
     }
  
-    public async Task<int> GetLatestWeightRecordAsync(Guid userId)
+    public async Task<WeightRecord> GetLatestWeightRecordAsync(Guid userId)
     {
         return await _context.WeightRecords
             .Where(w => w.User.Id == userId)
             .OrderByDescending(w => w.DateOfRecordCreated)
-            .Select(w => w.Weight)
             .FirstAsync();
     }
     
