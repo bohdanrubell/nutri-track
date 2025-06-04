@@ -6,7 +6,7 @@ export const validationSchema = yup.object({
         .string()
         .required("Назва продукту обов'язкове!")
         .min(5, "Назва продукту має містити мінімум 5 символів")
-        .max(100, "Назва продукту не може бути довшою за 50 символів"),
+        .max(50, "Назва продукту не може бути довшою за 50 символів"),
     categoryName: yup.string().required("Вибір категорії обов'язково!"),
     caloriesPer100Grams: yup
         .number()

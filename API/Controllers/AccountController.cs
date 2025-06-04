@@ -263,7 +263,7 @@ public class AccountController : ControllerBase
 
                 var weight = await _userService.GetLatestWeightRecordAsync(user.Id);
             
-                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, weight,
+                var calculator = new CaloriesCalc(user.UserGender, age, user.Height, weight.Weight,
                     userCurrentActivityLevel.ActivityLevel, userCurrentGoalType.Goal);
             
                 todayRecord.DailyCalories = calculator.CalculateDailyCalories();
@@ -286,6 +286,13 @@ public class AccountController : ControllerBase
         
             var user = await _userService.GetUserAsync();
 
+            var latestWeightRecord = await _userService.GetLatestWeightRecordAsync(user.Id);
+
+            if (latestWeightRecord.DateOfRecordCreated.Day == DateTime.Now.Date.Day)
+            {
+                return BadRequest("Сьогодні вже є запис про вагу. Будь ласка, спробуйте завтра.");
+            }
+            
             var newWeightRecord = WeightRecord.Create(timeProvider, request.Weight, user);
             await _context.WeightRecords.AddAsync(newWeightRecord, cancellationToken);
             

@@ -23,8 +23,8 @@ interface FormProperties {
 export default function ProductNutritionForm({productNutrition, cancelCreate}: FormProperties) {
     const { control, handleSubmit, reset, formState: { isSubmitting, isDirty} } = useForm({
         resolver: yupResolver<any>(validationSchema),
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+        mode: 'onChange',
+        reValidateMode: 'onChange'
     });
     const dispatch = useAppDispatch();
     const {categories} = useProductsNutrition();
